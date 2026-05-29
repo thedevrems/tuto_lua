@@ -5,57 +5,76 @@ contient un **cours**, et des **exercices** avec un éditeur de code, une **cons
 **tests automatiques** et une **solution**.
 
 Le code Lua de l'élève s'exécute **directement dans le navigateur** (Lua 5.4 via
-WebAssembly) — aucun serveur n'est nécessaire.
+WebAssembly). Un **backend Go** gère les comptes, la progression, le contenu des
+cours (stocké en base) et les paiements.
 
 ## ✨ Fonctionnalités
 
-- 📚 Cours organisés en **Modules → Chapitres → Cours / Exercices**
+- 📚 Cours organisés en **Modules → Chapitres → Cours / Exercices**, **stockés en base**
 - 💻 Éditeur de code intégré (coloration syntaxique Lua)
 - ▶️ **Console** : exécution du code et sortie de `print()`
 - ✅ **Tests automatiques** par exercice (✓ / ✗, compteur de réussite)
 - 💡 Indices progressifs et **solution** dépliable
-- 💾 Progression et code sauvegardés localement (navigateur)
-- 🎨 Interface **noir & blanc** moderne
+- 👤 **Comptes** (inscription / connexion), mots de passe **hachés bcrypt**, sessions JWT
+- 💾 **Progression par utilisateur** synchronisée (code du « dernier push » sauvegardé serveur)
+- 💳 **Achat de cours** par carte (Stripe) avec déblocage automatique
+- 🛠️ **Espace admin** : créer cours/tests, donner l'accès, voir le code des élèves
+- 🎨 Interface **noir & blanc** moderne (charte graphique)
 
 ## 🧰 Stack technique
 
 | Domaine | Choix |
 | --- | --- |
-| Front | React 18 + TypeScript + Vite |
-| Style | Tailwind CSS (thème monochrome) |
+| Front | React 18 + TypeScript + Vite + React Router |
+| Style | Tailwind CSS (thème clair monochrome, charte graphique) |
 | Exécution Lua | [wasmoon](https://github.com/ceifa/wasmoon) — Lua 5.4 en WebAssembly (client) |
 | Éditeur | CodeMirror 6 |
-| Contenu | Markdown (`react-markdown`) + données TypeScript |
+| Backend | **Go** (net/http + [chi](https://github.com/go-chi/chi)) + **SQLite** (pure-Go) |
+| Auth | bcrypt + JWT (HS256) |
+| Paiement | Stripe Checkout + webhook |
 
 ## 🚀 Démarrage rapide
 
+Deux services à lancer (deux terminaux) :
+
 ```bash
+# Terminal 1 — backend (API + base SQLite)
+cd server
+cp .env.example .env
+go run ./cmd/api          # http://localhost:8080  (le 1er compte créé = admin)
+
+# Terminal 2 — frontend
 cd web
 npm install
-npm run dev      # http://localhost:5173
+npm run dev               # http://localhost:5173
 ```
 
 Autres commandes :
 
 ```bash
-npm run build    # build de production -> web/dist/
-npm run preview  # sert le build de production
+cd web  && npm run build  # build de production -> web/dist/
+cd server && go test ./...# tests unitaires du backend
 ```
 
-Le site est **statique** : `web/dist/` se déploie sur GitHub Pages, Netlify, Vercel, etc.
+> Détails du backend (endpoints, architecture, Stripe) : [server/README.md](server/README.md).
 
 ## 📂 Structure du projet
 
 ```
 .
+├── server/                    # Backend Go (API REST + SQLite)
+│   ├── cmd/api/               #   point d'entrée
+│   ├── internal/              #   config, database, models, auth, store, handlers, payment…
+│   └── README.md              #   endpoints, architecture, Stripe
 ├── web/                       # Application (plateforme interactive)
 │   ├── src/
-│   │   ├── content/           # Le programme du cours
-│   │   │   ├── curriculum.ts  #   structure Modules/Chapitres/Exercices
-│   │   │   └── lessons/       #   textes de cours (.md)
-│   │   ├── components/        # UI (sidebar, éditeur, console, tests…)
-│   │   └── lib/lua.ts         # Exécution Lua + tests (wasmoon)
-│   └── README.md              # Guide : lancer & ajouter du contenu
+│   │   ├── content/           #   curriculum source + mapping API (fromApi, useCurriculum)
+│   │   ├── pages/             #   Home, Pricing, Login, Register, Learn, Admin
+│   │   ├── components/        #   UI (sidebar, éditeur, console, tests, admin…)
+│   │   ├── auth/              #   contexte d'authentification
+│   │   └── lib/               #   client API + exécution Lua (wasmoon)
+│   ├── scripts/               #   export-curriculum.mjs (génère le seed du backend)
+│   └── README.md              #   Guide : lancer & ajouter du contenu
 └── MODULE_1/                  # Sources Markdown d'origine (legacy)
 ```
 
