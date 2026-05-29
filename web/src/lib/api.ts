@@ -145,6 +145,11 @@ export const api = {
     mine: () => request<string[]>('GET', '/api/enrollments'),
   },
 
+  payments: {
+    checkout: (courseId: string) =>
+      request<{ url: string }>('POST', '/api/payments/checkout', { courseId }),
+  },
+
   admin: {
     users: () => request<User[]>('GET', '/api/admin/users'),
     courses: () => request<ApiCourse[]>('GET', '/api/admin/courses'),

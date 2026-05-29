@@ -19,6 +19,7 @@ type Deps struct {
 	Progress      *handlers.ProgressHandler
 	Enrollments   *handlers.EnrollmentHandler
 	Admin         *handlers.AdminHandler
+	Payments      *handlers.PaymentHandler
 	Guard         *auth.Middleware
 }
 
@@ -34,8 +35,18 @@ func New(d Deps) http.Handler {
 		mountCourseRoutes(api, d)
 		mountProgressRoutes(api, d)
 		mountAdminRoutes(api, d)
+		mountPaymentRoutes(api, d)
 	})
 	return r
+}
+
+// mountPaymentRoutes exposes Stripe Checkout creation (authenticated) and the
+// Stripe webhook (public — verified by signature, not by a token).
+func mountPaymentRoutes(api chi.Router, d Deps) {
+	api.Route("/payments", func(p chi.Router) {
+		p.With(d.Guard.RequireAuth).Post("/checkout", d.Payments.Checkout)
+		p.Post("/webhook", d.Payments.Webhook)
+	})
 }
 
 // mountAdminRoutes exposes the admin-only management & authoring endpoints.

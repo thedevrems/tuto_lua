@@ -16,6 +16,7 @@ import (
 	"github.com/thedevrems/tuto_lua/server/internal/config"
 	"github.com/thedevrems/tuto_lua/server/internal/database"
 	"github.com/thedevrems/tuto_lua/server/internal/handlers"
+	"github.com/thedevrems/tuto_lua/server/internal/payment"
 	"github.com/thedevrems/tuto_lua/server/internal/router"
 	"github.com/thedevrems/tuto_lua/server/internal/seed"
 	"github.com/thedevrems/tuto_lua/server/internal/store"
@@ -65,6 +66,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 	tokens := token.NewManager(cfg.JWTSecret, cfg.JWTTTL)
 	authSvc := auth.NewService(st, tokens)
 	guard := auth.NewMiddleware(tokens, st)
+	paySvc := payment.NewService(st, cfg.StripeSecretKey, cfg.StripeWebhook, cfg.FrontendURL)
 	return router.New(router.Deps{
 		AllowedOrigin: cfg.AllowedOrigin,
 		Auth:          handlers.NewAuthHandler(authSvc),
@@ -72,6 +74,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 		Progress:      handlers.NewProgressHandler(st),
 		Enrollments:   handlers.NewEnrollmentHandler(st),
 		Admin:         handlers.NewAdminHandler(st),
+		Payments:      handlers.NewPaymentHandler(paySvc),
 		Guard:         guard,
 	})
 }

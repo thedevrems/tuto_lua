@@ -70,6 +70,8 @@ internal/
 | POST    | `/api/admin/chapters/{chapterId}/lessons`  | admin | Créer une leçon         |
 | POST    | `/api/admin/chapters/{chapterId}/exercises`| admin | Créer un exercice       |
 | POST    | `/api/admin/exercises/{exerciseId}/tests`  | admin | Créer un test           |
+| POST    | `/api/payments/checkout` | connecté | Crée une session Stripe Checkout (→ URL) |
+| POST    | `/api/payments/webhook`  | Stripe   | Webhook : débloque le cours après paiement |
 
 \* `/api/courses/{slug}` accepte un token optionnel : les cours gratuits sont
 ouverts à tous, les cours payants exigent une inscription (achat) ou un rôle admin.
@@ -90,5 +92,22 @@ L'**administrateur** (premier compte créé) peut, via `/admin` côté frontend 
 créer des cours / chapitres / leçons / exercices / tests, donner l'accès à un
 cours, et consulter le **dernier code poussé** par chaque élève.
 
-> Le **paiement Stripe** (déblocage automatique après achat) est la dernière phase ;
-> il nécessite des clés Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
+## 💳 Paiement (Stripe)
+
+Le paiement par **Stripe Checkout** est intégré : l'achat d'un cours payant
+crée une session Checkout ; après paiement, le **webhook** débloque
+automatiquement l'accès (inscription). Tant que les clés ne sont pas
+renseignées, `/api/payments/checkout` répond `503` (désactivé proprement).
+
+Pour l'activer en local (mode test) :
+
+```bash
+# 1) Renseignez vos clés de test dans .env
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...      # fourni par la commande ci-dessous
+
+# 2) Relayez les webhooks Stripe vers le serveur local
+stripe listen --forward-to localhost:8080/api/payments/webhook
+```
+
+Carte de test Stripe : `4242 4242 4242 4242`, date future, CVC quelconque.

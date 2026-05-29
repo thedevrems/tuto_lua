@@ -42,6 +42,11 @@ func (s *Store) GetCourseBySlug(slug string) (models.Course, error) {
 	return scanCourse(s.db.QueryRow(`SELECT `+courseColumns+` FROM courses WHERE slug = ?`, slug))
 }
 
+// GetCourseByID loads a single course header by primary key.
+func (s *Store) GetCourseByID(id string) (models.Course, error) {
+	return scanCourse(s.db.QueryRow(`SELECT `+courseColumns+` FROM courses WHERE id = ?`, id))
+}
+
 // GetCourseTree loads a course with all its chapters, lessons, exercises and tests.
 func (s *Store) GetCourseTree(slug string) (models.Course, error) {
 	course, err := s.GetCourseBySlug(slug)

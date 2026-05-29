@@ -5,6 +5,7 @@ import { coursesToModules } from './fromApi'
 
 /** A paid course the current user cannot access yet (shown as a paywall). */
 export interface LockedCourse {
+  id: string
   slug: string
   title: string
   summary: string
@@ -67,7 +68,7 @@ async function accessibleCourseIds(user: User | null): Promise<Set<string>> {
 }
 
 function toLockedCourse(c: ApiCourse): LockedCourse {
-  return { slug: c.slug, title: c.title, summary: c.summary, priceCents: c.priceCents, currency: c.currency }
+  return { id: c.id, slug: c.slug, title: c.title, summary: c.summary, priceCents: c.priceCents, currency: c.currency }
 }
 
 function errorMessage(e: unknown): string {
