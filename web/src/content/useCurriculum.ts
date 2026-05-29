@@ -1,34 +1,75 @@
 import { useEffect, useState } from 'react'
-import { api } from '../lib/api'
+import { api, type ApiCourse, type User } from '../lib/api'
 import type { Module } from '../types'
 import { coursesToModules } from './fromApi'
 
+/** A paid course the current user cannot access yet (shown as a paywall). */
+export interface LockedCourse {
+  slug: string
+  title: string
+  summary: string
+  priceCents: number
+  currency: string
+}
+
 interface CurriculumState {
   modules: Module[] | null
+  locked: LockedCourse[]
   loading: boolean
   error: string | null
 }
 
-/** Loads the full course catalogue from the API and maps it to Module[]. */
-export function useCurriculum(): CurriculumState {
-  const [modules, setModules] = useState<Module[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
+/** Loads the catalogue, splits it into accessible vs locked courses for the
+ *  given user, and fetches full content only for the accessible ones. */
+export function useCurriculum(user: User | null): CurriculumState {
+  const [state, setState] = useState<CurriculumState>({ modules: null, locked: [], loading: true, error: null })
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const list = await api.courses.list()
-        const trees = await Promise.all(list.map((c) => api.courses.tree(c.slug)))
-        if (!cancelled) setModules(coursesToModules(trees))
+        const result = await loadCurriculum(user)
+        if (!cancelled) setState({ ...result, loading: false, error: null })
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Erreur de chargement des cours')
+        if (!cancelled) {
+          setState({ modules: null, locked: [], loading: false, error: errorMessage(e) })
+        }
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [user?.id, user?.role])
 
-  return { modules, loading: modules === null && error === null, error }
+  return state
+}
+
+async function loadCurriculum(user: User | null): Promise<{ modules: Module[]; locked: LockedCourse[] }> {
+  const catalogue = await api.courses.list()
+  const accessibleIds = await accessibleCourseIds(user)
+
+  const isOpen = (c: ApiCourse) =>
+    c.priceCents === 0 || user?.role === 'admin' || accessibleIds.has(c.id)
+
+  const trees = await Promise.all(catalogue.filter(isOpen).map((c) => api.courses.tree(c.slug)))
+  const locked = catalogue.filter((c) => !isOpen(c)).map(toLockedCourse)
+  return { modules: coursesToModules(trees), locked }
+}
+
+// accessibleCourseIds returns the set of course ids the user is enrolled in.
+async function accessibleCourseIds(user: User | null): Promise<Set<string>> {
+  if (!user) return new Set()
+  try {
+    return new Set(await api.enrollments.mine())
+  } catch {
+    return new Set()
+  }
+}
+
+function toLockedCourse(c: ApiCourse): LockedCourse {
+  return { slug: c.slug, title: c.title, summary: c.summary, priceCents: c.priceCents, currency: c.currency }
+}
+
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : 'Erreur de chargement des cours'
 }

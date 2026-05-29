@@ -69,6 +69,15 @@ export interface ApiCourse {
   chapters?: ApiChapter[]
 }
 
+export interface ApiProgress {
+  id: string
+  userId: string
+  exerciseId: string
+  code: string
+  completed: boolean
+  updatedAt: string
+}
+
 /** Error carrying the HTTP status so callers can branch on it. */
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -124,5 +133,15 @@ export const api = {
   courses: {
     list: () => request<ApiCourse[]>('GET', '/api/courses'),
     tree: (slug: string) => request<ApiCourse>('GET', `/api/courses/${slug}`),
+  },
+
+  progress: {
+    list: () => request<ApiProgress[]>('GET', '/api/progress'),
+    save: (exerciseId: string, code: string, completed: boolean) =>
+      request<ApiProgress>('PUT', `/api/progress/${exerciseId}`, { code, completed }),
+  },
+
+  enrollments: {
+    mine: () => request<string[]>('GET', '/api/enrollments'),
   },
 }

@@ -2,31 +2,22 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Item } from '../types'
 import { useAuth } from '../auth/AuthContext'
-import { useCurriculum } from '../content/useCurriculum'
+import { useCurriculum, type LockedCourse } from '../content/useCurriculum'
+import { useProgress } from '../content/useProgress'
 import Sidebar from '../components/Sidebar'
 import LessonContent from '../components/LessonContent'
 import ExercisePanel from '../components/ExercisePanel'
+import Paywall from '../components/Paywall'
 
-const LS_CODE = 'lua-academy:code'
-const LS_DONE = 'lua-academy:completed'
 const LS_LAST = 'lua-academy:last'
-
-function loadJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export default function LearnPage() {
   const { user, logout } = useAuth()
-  const { modules, loading, error } = useCurriculum()
+  const { modules, locked, loading, error } = useCurriculum(user)
+  const { codeMap, completed, saveCode, markSolved } = useProgress(user?.id ?? null)
 
-  const [codeMap, setCodeMap] = useState<Record<string, string>>(() => loadJSON(LS_CODE, {}))
-  const [completed, setCompleted] = useState<Set<string>>(() => new Set(loadJSON<string[]>(LS_DONE, [])))
   const [activeId, setActiveId] = useState<string>(() => localStorage.getItem(LS_LAST) ?? '')
+  const [lockedView, setLockedView] = useState<LockedCourse | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const allItems = useMemo<Item[]>(
@@ -34,7 +25,6 @@ export default function LearnPage() {
     [modules],
   )
 
-  // Once content has loaded, make sure the active id points at a real item.
   useEffect(() => {
     if (allItems.length > 0 && !allItems.some((i) => i.id === activeId)) {
       setActiveId(allItems[0].id)
@@ -53,25 +43,13 @@ export default function LearnPage() {
 
   const handleSelect = (item: Item) => {
     setActiveId(item.id)
+    setLockedView(null)
     setSidebarOpen(false)
   }
 
-  const handleCodeChange = (id: string, code: string) => {
-    setCodeMap((prev) => {
-      const next = { ...prev, [id]: code }
-      localStorage.setItem(LS_CODE, JSON.stringify(next))
-      return next
-    })
-  }
-
-  const handleSolved = (id: string) => {
-    setCompleted((prev) => {
-      if (prev.has(id)) return prev
-      const next = new Set(prev)
-      next.add(id)
-      localStorage.setItem(LS_DONE, JSON.stringify([...next]))
-      return next
-    })
+  const handleSelectLocked = (course: LockedCourse) => {
+    setLockedView(course)
+    setSidebarOpen(false)
   }
 
   const exerciseCount = allItems.filter((i) => i.kind === 'exercise').length
@@ -121,12 +99,13 @@ export default function LearnPage() {
         {/* Sidebar (overlay on mobile, fixed on desktop) */}
         <aside
           className={
-            'w-[300px] shrink-0 border-r border-gray-200 bg-white z-20 ' +
+            'w-[300px] shrink-0 border-r border-gray-200 bg-white z-20 overflow-y-auto ' +
             'lg:static lg:block ' +
             (sidebarOpen ? 'fixed inset-y-0 left-0 top-14 block' : 'hidden')
           }
         >
-          <Sidebar modules={modules ?? []} activeId={active?.id ?? ''} completed={completed} onSelect={handleSelect} />
+          <Sidebar modules={modules ?? []} activeId={lockedView ? '' : active?.id ?? ''} completed={completed} onSelect={handleSelect} />
+          <LockedList courses={locked} activeSlug={lockedView?.slug ?? ''} onSelect={handleSelectLocked} />
         </aside>
 
         {sidebarOpen && (
@@ -136,7 +115,9 @@ export default function LearnPage() {
         {/* Main content */}
         <main className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 min-h-0">
-            {loading ? (
+            {lockedView ? (
+              <Paywall course={lockedView} />
+            ) : loading ? (
               <div className="grid place-items-center h-full text-gray-500">Chargement des cours…</div>
             ) : error ? (
               <BackendError message={error} />
@@ -148,8 +129,8 @@ export default function LearnPage() {
               <ExercisePanel
                 exercise={active}
                 savedCode={codeMap[active.id]}
-                onCodeChange={handleCodeChange}
-                onSolved={handleSolved}
+                onCodeChange={saveCode}
+                onSolved={markSolved}
               />
             )}
           </div>
@@ -158,14 +139,14 @@ export default function LearnPage() {
           <footer className="flex items-center justify-between gap-2 px-4 py-2.5 border-t border-gray-200 shrink-0">
             <button
               onClick={() => prev && handleSelect(prev)}
-              disabled={!prev}
+              disabled={!prev || !!lockedView}
               className="text-[12px] px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-black disabled:opacity-30 disabled:hover:bg-transparent transition-colors max-w-[45%] truncate"
             >
               {prev ? `← ${prev.title}` : ''}
             </button>
             <button
               onClick={() => next && handleSelect(next)}
-              disabled={!next}
+              disabled={!next || !!lockedView}
               className="text-[12px] px-3 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-black disabled:opacity-30 disabled:hover:bg-transparent transition-colors max-w-[45%] truncate"
             >
               {next ? `${next.title} →` : ''}
@@ -173,6 +154,39 @@ export default function LearnPage() {
           </footer>
         </main>
       </div>
+    </div>
+  )
+}
+
+/** Lists paid courses the user has not unlocked, below the main navigation. */
+function LockedList({
+  courses,
+  activeSlug,
+  onSelect,
+}: {
+  courses: LockedCourse[]
+  activeSlug: string
+  onSelect: (c: LockedCourse) => void
+}) {
+  if (courses.length === 0) return null
+  return (
+    <div className="px-3 pb-6">
+      <div className="px-2 pt-4 pb-1 text-[11px] font-medium uppercase tracking-wide text-gray-500">
+        Cours à débloquer
+      </div>
+      {courses.map((c) => (
+        <button
+          key={c.slug}
+          onClick={() => onSelect(c)}
+          className={
+            'w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-md text-[13px] transition-colors ' +
+            (c.slug === activeSlug ? 'bg-black text-white font-medium' : 'text-gray-600 hover:bg-gray-100 hover:text-black')
+          }
+        >
+          <span className="shrink-0">🔒</span>
+          <span className="flex-1 leading-tight">{c.title}</span>
+        </button>
+      ))}
     </div>
   )
 }

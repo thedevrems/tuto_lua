@@ -16,6 +16,8 @@ type Deps struct {
 	AllowedOrigin string
 	Auth          *handlers.AuthHandler
 	Courses       *handlers.CourseHandler
+	Progress      *handlers.ProgressHandler
+	Enrollments   *handlers.EnrollmentHandler
 	Guard         *auth.Middleware
 }
 
@@ -29,16 +31,28 @@ func New(d Deps) http.Handler {
 		api.Get("/health", handlers.Health)
 		mountAuthRoutes(api, d)
 		mountCourseRoutes(api, d)
+		mountProgressRoutes(api, d)
 	})
 	return r
 }
 
 // mountCourseRoutes exposes the public course catalogue and content tree.
+// The tree uses optional auth so paid content can be gated per user.
 func mountCourseRoutes(api chi.Router, d Deps) {
 	api.Route("/courses", func(c chi.Router) {
 		c.Get("/", d.Courses.List)
-		c.Get("/{slug}", d.Courses.Tree)
+		c.With(d.Guard.OptionalAuth).Get("/{slug}", d.Courses.Tree)
 	})
+}
+
+// mountProgressRoutes exposes the per-user progress and enrollment endpoints.
+func mountProgressRoutes(api chi.Router, d Deps) {
+	api.Route("/progress", func(p chi.Router) {
+		p.Use(d.Guard.RequireAuth)
+		p.Get("/", d.Progress.List)
+		p.Put("/{exerciseId}", d.Progress.Save)
+	})
+	api.With(d.Guard.RequireAuth).Get("/enrollments", d.Enrollments.Mine)
 }
 
 // mountAuthRoutes groups the public and protected authentication endpoints.

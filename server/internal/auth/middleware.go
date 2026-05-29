@@ -37,6 +37,17 @@ func (m *Middleware) RequireAuth(next http.Handler) http.Handler {
 	})
 }
 
+// OptionalAuth injects the user when a valid token is present but never rejects
+// the request — used by endpoints whose response varies for logged-in users.
+func (m *Middleware) OptionalAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if user, ok := m.authenticate(r); ok {
+			r = r.WithContext(WithUser(r.Context(), user))
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 // RequireAdmin allows the request only for authenticated admins.
 func (m *Middleware) RequireAdmin(next http.Handler) http.Handler {
 	return m.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -69,6 +69,8 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 		AllowedOrigin: cfg.AllowedOrigin,
 		Auth:          handlers.NewAuthHandler(authSvc),
 		Courses:       handlers.NewCourseHandler(st),
+		Progress:      handlers.NewProgressHandler(st),
+		Enrollments:   handlers.NewEnrollmentHandler(st),
 		Guard:         guard,
 	})
 }
