@@ -56,6 +56,23 @@ func TestGetUserByIDNotFound(t *testing.T) {
 	}
 }
 
+func TestListUsersReturnsAllAccounts(t *testing.T) {
+	s := newTestStore(t)
+	if list, _ := s.ListUsers(); len(list) != 0 {
+		t.Fatalf("empty store ListUsers = %d, want 0", len(list))
+	}
+	_, _ = s.CreateUser("alice", "a@example.com", "h", models.RoleAdmin)
+	_, _ = s.CreateUser("bob", "b@example.com", "h", models.RoleUser)
+
+	list, err := s.ListUsers()
+	if err != nil {
+		t.Fatalf("ListUsers: %v", err)
+	}
+	if len(list) != 2 {
+		t.Fatalf("ListUsers = %d, want 2", len(list))
+	}
+}
+
 func TestCountUsers(t *testing.T) {
 	s := newTestStore(t)
 	if n, _ := s.CountUsers(); n != 0 {

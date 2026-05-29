@@ -71,6 +71,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 		Courses:       handlers.NewCourseHandler(st),
 		Progress:      handlers.NewProgressHandler(st),
 		Enrollments:   handlers.NewEnrollmentHandler(st),
+		Admin:         handlers.NewAdminHandler(st),
 		Guard:         guard,
 	})
 }

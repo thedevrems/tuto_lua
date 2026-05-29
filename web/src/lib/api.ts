@@ -144,4 +144,63 @@ export const api = {
   enrollments: {
     mine: () => request<string[]>('GET', '/api/enrollments'),
   },
+
+  admin: {
+    users: () => request<User[]>('GET', '/api/admin/users'),
+    courses: () => request<ApiCourse[]>('GET', '/api/admin/courses'),
+    userProgress: (userId: string) => request<ApiProgress[]>('GET', `/api/admin/users/${userId}/progress`),
+    grant: (userId: string, courseId: string) =>
+      request<null>('POST', '/api/admin/enrollments', { userId, courseId }),
+    createCourse: (input: NewCourse) => request<CreatedId>('POST', '/api/admin/courses', input),
+    createChapter: (courseId: string, input: NewChapter) =>
+      request<CreatedId>('POST', `/api/admin/courses/${courseId}/chapters`, input),
+    createLesson: (chapterId: string, input: NewLesson) =>
+      request<CreatedId>('POST', `/api/admin/chapters/${chapterId}/lessons`, input),
+    createExercise: (chapterId: string, input: NewExercise) =>
+      request<CreatedId>('POST', `/api/admin/chapters/${chapterId}/exercises`, input),
+    createTest: (exerciseId: string, input: NewTest) =>
+      request<CreatedId>('POST', `/api/admin/exercises/${exerciseId}/tests`, input),
+  },
+}
+
+export interface CreatedId {
+  id: string
+}
+
+export interface NewCourse {
+  slug: string
+  title: string
+  summary: string
+  priceCents: number
+  currency: string
+  published: boolean
+  position: number
+}
+
+export interface NewChapter {
+  title: string
+  summary: string
+  position: number
+}
+
+export interface NewLesson {
+  title: string
+  content: string
+  position: number
+}
+
+export interface NewExercise {
+  title: string
+  difficulty: 'facile' | 'moyen' | 'difficile'
+  statement: string
+  starter: string
+  solution: string
+  hints: string[]
+  position: number
+}
+
+export interface NewTest {
+  name: string
+  code: string
+  position: number
 }

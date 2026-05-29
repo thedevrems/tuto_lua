@@ -49,8 +49,27 @@ func (s *Store) CountUsers() (int, error) {
 	return n, err
 }
 
+// ListUsers returns every account, oldest first (admin user management).
+func (s *Store) ListUsers() ([]models.User, error) {
+	rows, err := s.db.Query(`SELECT ` + userColumns + ` FROM users ORDER BY created_at`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []models.User
+	for rows.Next() {
+		u, err := scanUser(rows)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, rows.Err()
+}
+
 // scanUser reads one user row, translating sql.ErrNoRows into ErrNotFound.
-func scanUser(row *sql.Row) (models.User, error) {
+func scanUser(row rowScanner) (models.User, error) {
 	var u models.User
 	var role string
 	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.PasswordHash, &role, &u.CreatedAt)

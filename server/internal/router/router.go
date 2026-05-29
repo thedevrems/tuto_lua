@@ -18,6 +18,7 @@ type Deps struct {
 	Courses       *handlers.CourseHandler
 	Progress      *handlers.ProgressHandler
 	Enrollments   *handlers.EnrollmentHandler
+	Admin         *handlers.AdminHandler
 	Guard         *auth.Middleware
 }
 
@@ -32,8 +33,25 @@ func New(d Deps) http.Handler {
 		mountAuthRoutes(api, d)
 		mountCourseRoutes(api, d)
 		mountProgressRoutes(api, d)
+		mountAdminRoutes(api, d)
 	})
 	return r
+}
+
+// mountAdminRoutes exposes the admin-only management & authoring endpoints.
+func mountAdminRoutes(api chi.Router, d Deps) {
+	api.Route("/admin", func(a chi.Router) {
+		a.Use(d.Guard.RequireAdmin)
+		a.Get("/users", d.Admin.ListUsers)
+		a.Get("/users/{userId}/progress", d.Admin.UserProgress)
+		a.Post("/enrollments", d.Admin.GrantAccess)
+		a.Get("/courses", d.Admin.ListCourses)
+		a.Post("/courses", d.Admin.CreateCourse)
+		a.Post("/courses/{courseId}/chapters", d.Admin.CreateChapter)
+		a.Post("/chapters/{chapterId}/lessons", d.Admin.CreateLesson)
+		a.Post("/chapters/{chapterId}/exercises", d.Admin.CreateExercise)
+		a.Post("/exercises/{exerciseId}/tests", d.Admin.CreateTest)
+	})
 }
 
 // mountCourseRoutes exposes the public course catalogue and content tree.

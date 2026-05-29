@@ -57,7 +57,22 @@ internal/
 | POST    | `/api/auth/login`     | public   | Connexion par e-mail ou username     |
 | GET     | `/api/auth/me`        | connecté | Profil de l'utilisateur authentifié  |
 | GET     | `/api/courses`        | public   | Catalogue des cours publiés          |
-| GET     | `/api/courses/{slug}` | public   | Arbre complet (chapitres/exos/tests) |
+| GET     | `/api/courses/{slug}` | public\* | Arbre complet (gratuit, ou inscrit/admin pour les payants) |
+| GET     | `/api/progress`       | connecté | Progression de l'utilisateur         |
+| PUT     | `/api/progress/{exerciseId}` | connecté | Sauvegarde code + complétion  |
+| GET     | `/api/enrollments`    | connecté | Cours auxquels l'utilisateur a accès |
+| GET     | `/api/admin/users`    | admin    | Liste des comptes                    |
+| GET     | `/api/admin/users/{userId}/progress` | admin | Dernier code (« push ») d'un élève |
+| POST    | `/api/admin/enrollments` | admin | Donner l'accès à un cours            |
+| GET     | `/api/admin/courses`  | admin    | Tous les cours (brouillons inclus)   |
+| POST    | `/api/admin/courses`  | admin    | Créer un cours                       |
+| POST    | `/api/admin/courses/{courseId}/chapters`   | admin | Créer un chapitre       |
+| POST    | `/api/admin/chapters/{chapterId}/lessons`  | admin | Créer une leçon         |
+| POST    | `/api/admin/chapters/{chapterId}/exercises`| admin | Créer un exercice       |
+| POST    | `/api/admin/exercises/{exerciseId}/tests`  | admin | Créer un test           |
+
+\* `/api/courses/{slug}` accepte un token optionnel : les cours gratuits sont
+ouverts à tous, les cours payants exigent une inscription (achat) ou un rôle admin.
 
 ## 📚 Contenu (cours, exercices, tests)
 
@@ -71,4 +86,9 @@ cd web && node scripts/export-curriculum.mjs   # régénère internal/seed/curri
 
 Chaque **module** devient un **cours** achetable (Module 1 gratuit, les autres payants).
 
-D'autres routes (progression, paiement, admin) arrivent dans les phases suivantes.
+L'**administrateur** (premier compte créé) peut, via `/admin` côté frontend :
+créer des cours / chapitres / leçons / exercices / tests, donner l'accès à un
+cours, et consulter le **dernier code poussé** par chaque élève.
+
+> Le **paiement Stripe** (déblocage automatique après achat) est la dernière phase ;
+> il nécessite des clés Stripe (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
