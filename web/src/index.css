@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  margin: 0;
+}
+
+/* Thin monochrome scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a42 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2c2c33;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #44444d;
+  background-clip: content-box;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Rendered markdown (lesson + exercise statements)                */
+/* ---------------------------------------------------------------- */
+.prose-lua {
+  @apply text-ink-200 leading-relaxed;
+}
+.prose-lua h1 {
+  @apply text-2xl font-bold text-white mt-0 mb-4 tracking-tight;
+}
+.prose-lua h2 {
+  @apply text-xl font-semibold text-white mt-8 mb-3 pb-2 border-b border-ink-800 tracking-tight;
+}
+.prose-lua h3 {
+  @apply text-base font-semibold text-ink-100 mt-6 mb-2;
+}
+.prose-lua h4 {
+  @apply text-sm font-semibold text-ink-200 mt-4 mb-1 uppercase tracking-wide;
+}
+.prose-lua p {
+  @apply my-3;
+}
+.prose-lua ul {
+  @apply my-3 ml-5 list-disc space-y-1;
+}
+.prose-lua ol {
+  @apply my-3 ml-5 list-decimal space-y-1;
+}
+.prose-lua li {
+  @apply pl-1;
+}
+.prose-lua a {
+  @apply text-white underline underline-offset-2 decoration-ink-600 hover:decoration-white;
+}
+.prose-lua strong {
+  @apply text-white font-semibold;
+}
+.prose-lua blockquote {
+  @apply border-l-2 border-ink-600 pl-4 italic text-ink-300 my-4;
+}
+.prose-lua hr {
+  @apply border-ink-800 my-6;
+}
+.prose-lua table {
+  @apply w-full text-sm my-4 border-collapse;
+}
+.prose-lua th,
+.prose-lua td {
+  @apply border border-ink-800 px-3 py-1.5 text-left;
+}
+.prose-lua th {
+  @apply bg-ink-850 text-white font-semibold;
+}
+
+/* inline code */
+.prose-lua :not(pre) > code {
+  @apply font-mono text-[0.85em] bg-ink-850 text-ink-100 px-1.5 py-0.5 rounded border border-ink-800;
+}
+
+/* fenced code blocks */
+.prose-lua pre {
+  @apply font-mono text-[0.82rem] leading-relaxed bg-ink-900 border border-ink-800 rounded-lg p-4 my-4 overflow-x-auto;
+}
+.prose-lua pre code {
+  @apply bg-transparent border-0 p-0 text-ink-100;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Grayscale syntax highlighting (highlight.js classes)            */
+/* ---------------------------------------------------------------- */
+.hljs-comment,
+.hljs-quote {
+  @apply text-ink-500 italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-built_in {
+  @apply text-white font-semibold;
+}
+.hljs-string,
+.hljs-attr,
+.hljs-template-variable {
+  @apply text-ink-300;
+}
+.hljs-number,
+.hljs-symbol,
+.hljs-meta {
+  @apply text-ink-200;
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name {
+  @apply text-white;
+}
+.hljs-params,
+.hljs-variable {
+  @apply text-ink-200;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- */
+/*  CodeMirror tweaks                                                */
+/* ---------------------------------------------------------------- */
+.cm-editor {
+  @apply text-[0.85rem] h-full;
+  background: transparent;
+}
+.cm-editor.cm-focused {
+  outline: none;
+}
+.cm-scroller {
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+}
