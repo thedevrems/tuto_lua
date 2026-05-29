@@ -17,6 +17,58 @@ export interface AuthResult {
   token: string
 }
 
+// ---- Course catalogue & content tree (mirrors the Go models) ----
+export interface ApiTest {
+  id: string
+  name: string
+  code: string
+  position: number
+}
+
+export interface ApiExercise {
+  id: string
+  chapterId: string
+  title: string
+  difficulty: 'facile' | 'moyen' | 'difficile'
+  statement: string
+  starter: string
+  solution?: string
+  hints?: string[]
+  position: number
+  tests?: ApiTest[]
+}
+
+export interface ApiLesson {
+  id: string
+  chapterId: string
+  title: string
+  content: string
+  position: number
+}
+
+export interface ApiChapter {
+  id: string
+  courseId: string
+  title: string
+  summary: string
+  position: number
+  lessons?: ApiLesson[]
+  exercises?: ApiExercise[]
+}
+
+export interface ApiCourse {
+  id: string
+  slug: string
+  title: string
+  summary: string
+  priceCents: number
+  currency: string
+  published: boolean
+  position: number
+  createdAt: string
+  chapters?: ApiChapter[]
+}
+
 /** Error carrying the HTTP status so callers can branch on it. */
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -68,4 +120,9 @@ export const api = {
   login: (identifier: string, password: string) =>
     request<AuthResult>('POST', '/api/auth/login', { identifier, password }),
   me: () => request<User>('GET', '/api/auth/me'),
+
+  courses: {
+    list: () => request<ApiCourse[]>('GET', '/api/courses'),
+    tree: (slug: string) => request<ApiCourse>('GET', `/api/courses/${slug}`),
+  },
 }

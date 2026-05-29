@@ -47,6 +47,8 @@ type Exercise struct {
 	Starter    string         `json:"starter"`
 	// Solution is omitted from listings and only sent on demand.
 	Solution string         `json:"solution,omitempty"`
+	// Hints are progressive tips revealed one by one by the UI.
+	Hints    []string       `json:"hints,omitempty"`
 	Position int            `json:"position"`
 	Tests    []ExerciseTest `json:"tests,omitempty"`
 }

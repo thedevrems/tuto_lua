@@ -15,6 +15,7 @@ import (
 type Deps struct {
 	AllowedOrigin string
 	Auth          *handlers.AuthHandler
+	Courses       *handlers.CourseHandler
 	Guard         *auth.Middleware
 }
 
@@ -27,8 +28,17 @@ func New(d Deps) http.Handler {
 	r.Route("/api", func(api chi.Router) {
 		api.Get("/health", handlers.Health)
 		mountAuthRoutes(api, d)
+		mountCourseRoutes(api, d)
 	})
 	return r
+}
+
+// mountCourseRoutes exposes the public course catalogue and content tree.
+func mountCourseRoutes(api chi.Router, d Deps) {
+	api.Route("/courses", func(c chi.Router) {
+		c.Get("/", d.Courses.List)
+		c.Get("/{slug}", d.Courses.Tree)
+	})
 }
 
 // mountAuthRoutes groups the public and protected authentication endpoints.

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { curriculum } from '../content/curriculum'
 import type { Item } from '../types'
 import { useAuth } from '../auth/AuthContext'
+import { useCurriculum } from '../content/useCurriculum'
 import Sidebar from '../components/Sidebar'
 import LessonContent from '../components/LessonContent'
 import ExercisePanel from '../components/ExercisePanel'
@@ -10,9 +10,6 @@ import ExercisePanel from '../components/ExercisePanel'
 const LS_CODE = 'lua-academy:code'
 const LS_DONE = 'lua-academy:completed'
 const LS_LAST = 'lua-academy:last'
-
-// Flattened, ordered list of all reachable items (for lookup + prev/next).
-const allItems: Item[] = curriculum.flatMap((m) => m.chapters.flatMap((c) => c.items))
 
 function loadJSON<T>(key: string, fallback: T): T {
   try {
@@ -25,24 +22,34 @@ function loadJSON<T>(key: string, fallback: T): T {
 
 export default function LearnPage() {
   const { user, logout } = useAuth()
+  const { modules, loading, error } = useCurriculum()
+
   const [codeMap, setCodeMap] = useState<Record<string, string>>(() => loadJSON(LS_CODE, {}))
   const [completed, setCompleted] = useState<Set<string>>(() => new Set(loadJSON<string[]>(LS_DONE, [])))
-  const [activeId, setActiveId] = useState<string>(() => {
-    const last = localStorage.getItem(LS_LAST)
-    if (last && allItems.some((i) => i.id === last)) return last
-    return allItems[0]?.id ?? ''
-  })
+  const [activeId, setActiveId] = useState<string>(() => localStorage.getItem(LS_LAST) ?? '')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const active = useMemo(() => allItems.find((i) => i.id === activeId) ?? allItems[0], [activeId])
+  const allItems = useMemo<Item[]>(
+    () => (modules ?? []).flatMap((m) => m.chapters.flatMap((c) => c.items)),
+    [modules],
+  )
 
-  const index = allItems.findIndex((i) => i.id === active?.id)
-  const prev = index > 0 ? allItems[index - 1] : null
-  const next = index >= 0 && index < allItems.length - 1 ? allItems[index + 1] : null
+  // Once content has loaded, make sure the active id points at a real item.
+  useEffect(() => {
+    if (allItems.length > 0 && !allItems.some((i) => i.id === activeId)) {
+      setActiveId(allItems[0].id)
+    }
+  }, [allItems, activeId])
+
+  const active = useMemo(() => allItems.find((i) => i.id === activeId) ?? null, [allItems, activeId])
 
   useEffect(() => {
     if (active) localStorage.setItem(LS_LAST, active.id)
   }, [active])
+
+  const index = allItems.findIndex((i) => i.id === active?.id)
+  const prev = index > 0 ? allItems[index - 1] : null
+  const next = index >= 0 && index < allItems.length - 1 ? allItems[index + 1] : null
 
   const handleSelect = (item: Item) => {
     setActiveId(item.id)
@@ -119,7 +126,7 @@ export default function LearnPage() {
             (sidebarOpen ? 'fixed inset-y-0 left-0 top-14 block' : 'hidden')
           }
         >
-          <Sidebar modules={curriculum} activeId={active?.id ?? ''} completed={completed} onSelect={handleSelect} />
+          <Sidebar modules={modules ?? []} activeId={active?.id ?? ''} completed={completed} onSelect={handleSelect} />
         </aside>
 
         {sidebarOpen && (
@@ -129,7 +136,11 @@ export default function LearnPage() {
         {/* Main content */}
         <main className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 min-h-0">
-            {!active ? (
+            {loading ? (
+              <div className="grid place-items-center h-full text-gray-500">Chargement des cours…</div>
+            ) : error ? (
+              <BackendError message={error} />
+            ) : !active ? (
               <div className="grid place-items-center h-full text-gray-500">Sélectionnez un cours.</div>
             ) : active.kind === 'lesson' ? (
               <LessonContent lesson={active} />
@@ -161,6 +172,21 @@ export default function LearnPage() {
             </button>
           </footer>
         </main>
+      </div>
+    </div>
+  )
+}
+
+/** Shown when the course API is unreachable (e.g. backend not started). */
+function BackendError({ message }: { message: string }) {
+  return (
+    <div className="grid h-full place-items-center px-6 text-center">
+      <div className="max-w-md">
+        <h2 className="text-lg font-semibold text-black">Impossible de charger les cours</h2>
+        <p className="mt-2 text-sm text-gray-600">{message}</p>
+        <p className="mt-4 text-xs text-gray-500">
+          Vérifiez que le backend tourne (<code className="font-mono">cd server &amp;&amp; go run ./cmd/api</code>).
+        </p>
       </div>
     </div>
   )

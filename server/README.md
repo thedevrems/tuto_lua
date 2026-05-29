@@ -52,9 +52,23 @@ internal/
 
 | Méthode | Route                | Accès    | Description                          |
 | ------- | -------------------- | -------- | ------------------------------------ |
-| GET     | `/api/health`        | public   | Sonde de disponibilité               |
-| POST    | `/api/auth/register` | public   | Création de compte (+ token)         |
-| POST    | `/api/auth/login`    | public   | Connexion par e-mail ou username     |
-| GET     | `/api/auth/me`       | connecté | Profil de l'utilisateur authentifié  |
+| GET     | `/api/health`         | public   | Sonde de disponibilité               |
+| POST    | `/api/auth/register`  | public   | Création de compte (+ token)         |
+| POST    | `/api/auth/login`     | public   | Connexion par e-mail ou username     |
+| GET     | `/api/auth/me`        | connecté | Profil de l'utilisateur authentifié  |
+| GET     | `/api/courses`        | public   | Catalogue des cours publiés          |
+| GET     | `/api/courses/{slug}` | public   | Arbre complet (chapitres/exos/tests) |
 
-D'autres routes (cours, progression, paiement, admin) arrivent dans les phases suivantes.
+## 📚 Contenu (cours, exercices, tests)
+
+Les cours, chapitres, leçons, exercices, **tests** et indices sont stockés en base.
+Au **premier démarrage** (base vide), le catalogue est **semé** depuis
+`internal/seed/curriculum.json` — fichier généré à partir du curriculum frontend :
+
+```bash
+cd web && node scripts/export-curriculum.mjs   # régénère internal/seed/curriculum.json
+```
+
+Chaque **module** devient un **cours** achetable (Module 1 gratuit, les autres payants).
+
+D'autres routes (progression, paiement, admin) arrivent dans les phases suivantes.

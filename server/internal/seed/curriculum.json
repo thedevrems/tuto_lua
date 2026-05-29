@@ -1,0 +1,674 @@
+[
+  {
+    "slug": "m1",
+    "title": "Module 1 — Fondamentaux de Lua",
+    "summary": "Syntaxe, variables, types, opérateurs et structures de contrôle.",
+    "priceCents": 0,
+    "currency": "eur",
+    "published": true,
+    "position": 0,
+    "chapters": [
+      {
+        "title": "Chapitre 1 — Introduction et premiers pas",
+        "summary": "Syntaxe de base, variables, types de données et opérateurs.",
+        "position": 0,
+        "lessons": [
+          {
+            "title": "Cours",
+            "content": "# Chapitre 1 — Introduction et premiers pas\r\n\r\n## Objectifs du chapitre\r\n\r\nÀ la fin de ce chapitre, vous serez capable de :\r\n\r\n- Comprendre la syntaxe de base de Lua\r\n- Utiliser les différents types de données\r\n- Manipuler les variables et les opérateurs\r\n- Écrire vos premiers programmes Lua\r\n\r\n## 1. Introduction à Lua\r\n\r\nLua est un langage de programmation léger, rapide et puissant, particulièrement adapté à l'intégration dans d'autres applications. Dans le contexte de **FiveM**, Lua sert à créer des scripts côté client et serveur.\r\n\r\n**Caractéristiques principales :**\r\n\r\n- **Simplicité** — syntaxe claire et intuitive\r\n- **Performance** — exécution rapide grâce à LuaJIT\r\n- **Flexibilité** — typage dynamique\r\n- **Intégration** — facilement embarquable dans d'autres programmes\r\n\r\n> Sur cette plateforme, vous n'avez rien à installer : chaque exemple et chaque exercice s'exécute directement dans votre navigateur. Cliquez sur **Lancer** pour voir le résultat.\r\n\r\n## 2. Syntaxe de base\r\n\r\n### Premier programme\r\n\r\n```lua\r\n-- Ceci est un commentaire sur une ligne\r\nprint(\"Hello, world!\")\r\n\r\n--[[\r\n  Ceci est un commentaire\r\n  sur plusieurs lignes\r\n--]]\r\n```\r\n\r\n### Règles importantes\r\n\r\n- **Sensibilité à la casse** : `Variable` ≠ `variable`\r\n- **Pas de point-virgule obligatoire** (mais possible pour la clarté)\r\n- **Mots-clés réservés** : `and`, `break`, `do`, `else`, `elseif`, `end`, `false`, `for`, `function`, `if`, `in`, `local`, `nil`, `not`, `or`, `repeat`, `return`, `then`, `true`, `until`, `while`\r\n\r\n## 3. Variables et conventions de nommage\r\n\r\n**Toutes les variables doivent être nommées en anglais.** On distingue plusieurs conventions selon la portée :\r\n\r\n| Élément | Convention | Exemple |\r\n| --- | --- | --- |\r\n| Variable locale | `camelCase` | `playerName`, `currentHealth` |\r\n| Constante | `SNAKE_CASE_MAJUSCULE` | `MAX_PLAYERS`, `MAX_HEALTH` |\r\n| Variable globale | `PascalCase` | `PlayerData`, `ServerSettings` |\r\n| Fonction locale | `camelCase` | `calculateDistance` |\r\n| Fonction globale | `PascalCase` | `GetPlayerMoney` |\r\n\r\n### Déclaration\r\n\r\n```lua\r\n-- Variable globale (PascalCase)\r\nPlayerName = \"John\"\r\n\r\n-- Variable locale (camelCase) — RECOMMANDÉE\r\nlocal playerAge = 25\r\n\r\n-- Constante (SNAKE_CASE_MAJUSCULE)\r\nlocal MAX_HEALTH = 100\r\n\r\n-- Plusieurs déclarations à la fois\r\nlocal posX, posY, posZ = 1, 2, 3\r\n```\r\n\r\n> **Bonne pratique :** préférez toujours `local` pour éviter de polluer l'espace global.\r\n\r\n## 4. Les types de données\r\n\r\n### nil\r\n\r\n```lua\r\nlocal emptyVariable = nil\r\nprint(type(emptyVariable)) -- nil\r\n```\r\n\r\n### boolean\r\n\r\n```lua\r\nlocal isActive = true\r\nlocal isDisabled = false\r\n```\r\n\r\n### number\r\n\r\n```lua\r\nlocal playerLevel = 42        -- entier\r\nlocal healthPercentage = 85.5 -- décimal\r\nlocal largeNumber = 1.23e10   -- notation scientifique\r\nlocal colorCode = 0xFF0000    -- hexadécimal\r\n```\r\n\r\n### string\r\n\r\n```lua\r\nlocal firstName = 'Alice'                 -- guillemets simples\r\nlocal welcome = \"Welcome to the server!\"  -- guillemets doubles\r\n\r\nlocal serverRules = [[\r\n1. No cheating allowed\r\n2. Respect other players\r\n3. Have fun!\r\n]]\r\n\r\nlocal greeting = \"Hello \" .. firstName    -- concaténation\r\n```\r\n\r\n### La fonction `type()`\r\n\r\n```lua\r\nprint(type(42))      -- number\r\nprint(type(\"hello\")) -- string\r\nprint(type(true))    -- boolean\r\nprint(type(nil))     -- nil\r\n```\r\n\r\n## 5. Les opérateurs\r\n\r\n### Arithmétiques\r\n\r\n```lua\r\nlocal a, b = 10, 3\r\n\r\nprint(a + b)  -- Addition : 13\r\nprint(a - b)  -- Soustraction : 7\r\nprint(a * b)  -- Multiplication : 30\r\nprint(a / b)  -- Division : 3.333...\r\nprint(a % b)  -- Modulo (reste) : 1\r\nprint(a ^ b)  -- Puissance : 1000\r\nprint(-a)     -- Négation : -10\r\n```\r\n\r\n### Comparaison\r\n\r\n```lua\r\nlocal x, y = 5, 5\r\n\r\nprint(x == y)  -- Égalité : true\r\nprint(x ~= y)  -- Différence : false   (le \"différent de\" s'écrit ~=)\r\nprint(x < y)   -- false\r\nprint(x <= y)  -- true\r\n```\r\n\r\n### Logiques\r\n\r\n```lua\r\nprint(true and false) -- ET logique : false\r\nprint(true or false)  -- OU logique : true\r\nprint(not true)       -- NON logique : false\r\n```\r\n\r\n### Concaténation\r\n\r\n```lua\r\nlocal firstName = \"Marie\"\r\nlocal lastName = \"Johnson\"\r\nprint(firstName .. \" \" .. lastName) -- Marie Johnson\r\n```\r\n\r\n### L'opérateur ternaire de Lua\r\n\r\nLua n'a pas de `? :` mais on l'imite avec `and` / `or` :\r\n\r\n```lua\r\nlocal playerAge = 20\r\nlocal status = (playerAge >= 18) and \"adult\" or \"minor\"\r\nprint(\"Status:\", status) -- Status: adult\r\n\r\n-- Forme générale : condition and valeur_si_vrai or valeur_si_faux\r\n```\r\n\r\n## 6. Points clés à retenir\r\n\r\n1. Préférez toujours `local`.\r\n2. Nommez en anglais, en respectant les conventions (`camelCase`, `PascalCase`, `SNAKE_CASE_MAJUSCULE`).\r\n3. Les 4 types de base : `nil`, `boolean`, `number`, `string`.\r\n4. Le typage est dynamique : une variable peut changer de type.\r\n5. La concaténation se fait avec `..`.\r\n6. Commentaires : `--` pour une ligne, `--[[ ]]` pour un bloc.\r\n\r\n---\r\n\r\nÀ vous de jouer ! Passez aux exercices ci-contre pour mettre tout ça en pratique.\r\n",
+            "position": 0
+          }
+        ],
+        "exercises": [
+          {
+            "title": "Exercice 1 — Variables et types",
+            "difficulty": "facile",
+            "statement": "Déclarez les variables suivantes en respectant les conventions de nommage, puis affichez le **type** de chacune avec `type()` :\n\n1. une variable locale `firstName` contenant votre prénom (en anglais)\n2. une variable locale `playerAge` contenant un âge\n3. une variable booléenne `likesToProgram`\n4. une constante `MAX_PLAYERS` valant `32`\n\nLa sortie doit contenir au moins les mots `string`, `number` et `boolean`.",
+            "starter": "-- Déclarez vos variables ici\nlocal firstName = \n\n-- Affichez le type de chaque variable, par exemple :\n-- print(\"firstName:\", type(firstName))",
+            "solution": "local firstName = \"Alice\"\nlocal playerAge = 28\nlocal likesToProgram = true\nlocal MAX_PLAYERS = 32\n\nprint(\"firstName:\", type(firstName))\nprint(\"playerAge:\", type(playerAge))\nprint(\"likesToProgram:\", type(likesToProgram))\nprint(\"MAX_PLAYERS:\", type(MAX_PLAYERS))",
+            "hints": [
+              "Pour afficher un type : print(type(maVariable)).",
+              "Un booléen vaut true ou false, sans guillemets."
+            ],
+            "position": 1,
+            "tests": [
+              {
+                "name": "Un type \"string\" est affiché",
+                "code": "assert(printed(\"string\"), \"Aucune string affichée\")",
+                "position": 0
+              },
+              {
+                "name": "Un type \"number\" est affiché",
+                "code": "assert(printed(\"number\"), \"Aucun number affiché\")",
+                "position": 1
+              },
+              {
+                "name": "Un type \"boolean\" est affiché",
+                "code": "assert(printed(\"boolean\"), \"Aucun boolean affiché\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 2 — Calculs arithmétiques",
+            "difficulty": "facile",
+            "statement": "Les deux nombres sont déjà définis (`firstNumber = 15`, `secondNumber = 4`).\n\nAffichez, dans cet ordre, leur **somme**, leur **différence**, leur **produit**, leur **division** et le **reste** (modulo).",
+            "starter": "local firstNumber = 15\nlocal secondNumber = 4\n\n-- Affichez somme, différence, produit, division et reste\nprint(\"Sum:\", )",
+            "solution": "local firstNumber = 15\nlocal secondNumber = 4\n\nprint(\"Sum:\", firstNumber + secondNumber)\nprint(\"Difference:\", firstNumber - secondNumber)\nprint(\"Product:\", firstNumber * secondNumber)\nprint(\"Division:\", firstNumber / secondNumber)\nprint(\"Remainder:\", firstNumber % secondNumber)",
+            "hints": [],
+            "position": 2,
+            "tests": [
+              {
+                "name": "Somme = 19",
+                "code": "assert(printed(\"19\"), \"La somme (19) n'apparaît pas\")",
+                "position": 0
+              },
+              {
+                "name": "Différence = 11",
+                "code": "assert(printed(\"11\"), \"La différence (11) n'apparaît pas\")",
+                "position": 1
+              },
+              {
+                "name": "Produit = 60",
+                "code": "assert(printed(\"60\"), \"Le produit (60) n'apparaît pas\")",
+                "position": 2
+              },
+              {
+                "name": "Division = 3.75",
+                "code": "assert(printed(\"3.75\"), \"La division (3.75) n'apparaît pas\")",
+                "position": 3
+              },
+              {
+                "name": "Reste = 3",
+                "code": "assert(printed(\"3\"), \"Le reste (3) n'apparaît pas\")",
+                "position": 4
+              }
+            ]
+          },
+          {
+            "title": "Exercice 3 — Manipulation de chaînes",
+            "difficulty": "moyen",
+            "statement": "À partir de `firstName = \"John\"` et `lastName = \"Smith\"` :\n\n1. construisez `fullName` par concaténation (avec un espace)\n2. affichez exactement : `Welcome John Smith to Lua programming!`",
+            "starter": "local firstName = \"John\"\nlocal lastName = \"Smith\"\n\n-- Construisez fullName puis affichez le message de bienvenue",
+            "solution": "local firstName = \"John\"\nlocal lastName = \"Smith\"\nlocal fullName = firstName .. \" \" .. lastName\nprint(\"Welcome \" .. fullName .. \" to Lua programming!\")",
+            "hints": [
+              "On concatène avec l'opérateur .. : a .. \" \" .. b"
+            ],
+            "position": 3,
+            "tests": [
+              {
+                "name": "Message de bienvenue exact",
+                "code": "assert(printed(\"Welcome John Smith to Lua programming!\"), \"Le message attendu n'apparaît pas\")",
+                "position": 0
+              }
+            ]
+          },
+          {
+            "title": "Exercice 4 — Opérateurs logiques",
+            "difficulty": "moyen",
+            "statement": "Une personne peut conduire si elle est majeure **ET** a le permis **ET** possède un véhicule.\n\nAvec `isAdult = true`, `hasLicense = true`, `hasVehicle = false` :\n\n1. calculez `canDrive` à l'aide des opérateurs logiques\n2. affichez `Can drive: false`",
+            "starter": "local isAdult = true\nlocal hasLicense = true\nlocal hasVehicle = false\n\nlocal canDrive = \nprint(\"Can drive:\", canDrive)",
+            "solution": "local isAdult = true\nlocal hasLicense = true\nlocal hasVehicle = false\n\nlocal canDrive = isAdult and hasLicense and hasVehicle\nprint(\"Can drive:\", canDrive)",
+            "hints": [
+              "Combinez les trois booléens avec and : a and b and c"
+            ],
+            "position": 4,
+            "tests": [
+              {
+                "name": "Résultat : Can drive: false",
+                "code": "assert(printed(\"Can drive:\") and printed(\"false\"), \"On attend 'Can drive: false'\")",
+                "position": 0
+              }
+            ]
+          },
+          {
+            "title": "Exercice 5 — Défis",
+            "difficulty": "difficile",
+            "statement": "Plusieurs petits défis avec des valeurs déjà fixées :\n\n1. **Aire** d'un rectangle de longueur `8` et largeur `5` (résultat : `40`)\n2. **Périmètre** du même rectangle (résultat : `26`)\n3. Déterminez si `testNumber = 8` est pair grâce au modulo et affichez le mot `even` (sinon `odd`)\n\nAffichez chacun de ces résultats.",
+            "starter": "local length = 8\nlocal width = 5\nlocal testNumber = 8\n\n-- 1. aire   2. périmètre   3. pair ou impair (even / odd)",
+            "solution": "local length = 8\nlocal width = 5\nlocal testNumber = 8\n\nlocal area = length * width\nlocal perimeter = 2 * (length + width)\nprint(\"Area:\", area)\nprint(\"Perimeter:\", perimeter)\n\nlocal isEven = (testNumber % 2 == 0)\nprint(\"The number \" .. testNumber .. \" is \" .. (isEven and \"even\" or \"odd\"))",
+            "hints": [
+              "Aire = longueur × largeur, périmètre = 2 × (longueur + largeur).",
+              "Un nombre est pair si n % 2 == 0."
+            ],
+            "position": 5,
+            "tests": [
+              {
+                "name": "Aire = 40",
+                "code": "assert(printed(\"40\"), \"L'aire (40) n'apparaît pas\")",
+                "position": 0
+              },
+              {
+                "name": "Périmètre = 26",
+                "code": "assert(printed(\"26\"), \"Le périmètre (26) n'apparaît pas\")",
+                "position": 1
+              },
+              {
+                "name": "8 est pair (even)",
+                "code": "assert(printed(\"even\"), \"Le mot 'even' n'apparaît pas\")",
+                "position": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapitre 2 — Structures de contrôle",
+        "summary": "Conditions, boucles, break et return.",
+        "position": 1,
+        "lessons": [
+          {
+            "title": "Cours",
+            "content": "# Chapitre 2 — Structures de contrôle\r\n\r\n## Objectifs du chapitre\r\n\r\nÀ la fin de ce chapitre, vous serez capable de :\r\n\r\n- Utiliser les conditions pour contrôler le flux d'exécution\r\n- Implémenter les différents types de boucles\r\n- Maîtriser `break` et `return`\r\n- Construire une logique conditionnelle lisible\r\n\r\n## 1. Les conditions\r\n\r\n### `if` simple\r\n\r\n```lua\r\nlocal playerHealth = 50\r\n\r\nif playerHealth <= 0 then\r\n    print(\"Player is dead!\")\r\nend\r\n```\r\n\r\n### `if / else`\r\n\r\n```lua\r\nlocal playerAge = 20\r\n\r\nif playerAge >= 18 then\r\n    print(\"Player is an adult\")\r\nelse\r\n    print(\"Player is a minor\")\r\nend\r\n```\r\n\r\n### `if / elseif / else`\r\n\r\n```lua\r\nlocal examScore = 85\r\n\r\nif examScore >= 90 then\r\n    print(\"Grade: Excellent\")\r\nelseif examScore >= 70 then\r\n    print(\"Grade: Good\")\r\nelseif examScore >= 50 then\r\n    print(\"Grade: Average\")\r\nelse\r\n    print(\"Grade: Failed\")\r\nend\r\n```\r\n\r\n### Conditions multiples\r\n\r\n```lua\r\nlocal playerLevel = 25\r\nlocal playerGold = 1500\r\nlocal hasPermission = true\r\n\r\nif playerLevel >= 20 and playerGold >= 1000 then\r\n    print(\"Can buy premium weapon\")\r\nend\r\n\r\nif playerLevel >= 50 or hasPermission then\r\n    print(\"Can access VIP area\")\r\nend\r\n\r\nif not hasPermission then\r\n    print(\"Access denied\")\r\nend\r\n```\r\n\r\n### Valeurs « falsy » et « truthy »\r\n\r\nEn Lua, **seules `false` et `nil` sont fausses**. Tout le reste est vrai !\r\n\r\n```lua\r\nif 0 then print(\"0 is true!\") end            -- VRAI (différent du C/JS)\r\nif \"\" then print(\"Empty string is true!\") end -- VRAI\r\nif {} then print(\"Empty table is true!\") end  -- VRAI\r\n```\r\n\r\n## 2. Les boucles\r\n\r\n### Boucle `for` numérique\r\n\r\n```lua\r\n-- for variable = début, fin, pas do   (le pas est optionnel, défaut 1)\r\n\r\nfor i = 1, 5 do\r\n    print(\"Iteration:\", i)\r\nend\r\n\r\nfor i = 0, 10, 2 do\r\n    print(\"Even number:\", i) -- 0, 2, 4, 6, 8, 10\r\nend\r\n\r\nfor i = 10, 1, -1 do\r\n    print(\"Countdown:\", i)\r\nend\r\n```\r\n\r\n### Boucle `for` générique (itérateurs)\r\n\r\n```lua\r\nlocal playerNames = {\"Alice\", \"Bob\", \"Charlie\", \"Diana\"}\r\n\r\nfor index, name in ipairs(playerNames) do\r\n    print(index, name)\r\nend\r\n```\r\n\r\n### Boucle `while`\r\n\r\n```lua\r\nlocal counter = 0\r\nwhile counter < 5 do\r\n    counter = counter + 1\r\n    print(\"Counter:\", counter) -- pensez TOUJOURS à faire évoluer la condition\r\nend\r\n```\r\n\r\n### Boucle `repeat / until`\r\n\r\n```lua\r\n-- S'exécute AU MOINS UNE FOIS\r\nlocal i = 0\r\nrepeat\r\n    i = i + 1\r\n    print(\"i =\", i)\r\nuntil i >= 3\r\n```\r\n\r\n## 3. Instructions de contrôle\r\n\r\n### `break`\r\n\r\n```lua\r\nfor i = 1, 100 do\r\n    if i == 42 then\r\n        print(\"Target found at:\", i)\r\n        break -- sort de la boucle immédiatement\r\n    end\r\nend\r\n```\r\n\r\n### `return`\r\n\r\n```lua\r\nfunction checkAccess(level, required)\r\n    if level < required then\r\n        print(\"Access denied\")\r\n        return false\r\n    end\r\n    print(\"Access granted\")\r\n    return true\r\nend\r\n```\r\n\r\n## 4. Bonnes pratiques\r\n\r\n- **Évitez les boucles infinies** : assurez-vous que la condition peut devenir fausse.\r\n- **Préférez `for` à `while`** quand le nombre d'itérations est connu.\r\n- **Découpez les conditions complexes** en variables intermédiaires nommées :\r\n\r\n```lua\r\nlocal canAccessPremium = playerLevel >= 20 and playerGold >= 1000\r\nlocal hasVipAccess = isVip and playerLevel >= 10\r\n\r\nif canAccessPremium or hasVipAccess or isAdmin then\r\n    -- ...\r\nend\r\n```\r\n\r\n## 5. Points clés à retenir\r\n\r\n1. `if / elseif / else` pour les conditions.\r\n2. `and`, `or`, `not` pour combiner.\r\n3. Seules `false` et `nil` sont « falsy ».\r\n4. `for` numérique, `for` générique, `while`, `repeat/until`.\r\n5. `break` sort d'une boucle, `return` sort d'une fonction.\r\n\r\n---\r\n\r\nPassez aux exercices pour pratiquer conditions et boucles.\r\n",
+            "position": 0
+          }
+        ],
+        "exercises": [
+          {
+            "title": "Exercice 1 — Calculateur de notes",
+            "difficulty": "facile",
+            "statement": "À partir de `examScore = 87`, attribuez une lettre avec `if / elseif / else` :\n\n- `A` : 90–100 — `B` : 80–89 — `C` : 70–79 — `D` : 60–69 — `F` : 0–59\n\nAffichez la lettre. Avec 87, on attend la lettre `B`.",
+            "starter": "local examScore = 87\n\n-- Déterminez la lettre puis affichez-la",
+            "solution": "local examScore = 87\nlocal grade\n\nif examScore >= 90 then\n    grade = \"A\"\nelseif examScore >= 80 then\n    grade = \"B\"\nelseif examScore >= 70 then\n    grade = \"C\"\nelseif examScore >= 60 then\n    grade = \"D\"\nelse\n    grade = \"F\"\nend\n\nprint(\"Grade:\", grade)",
+            "hints": [],
+            "position": 1,
+            "tests": [
+              {
+                "name": "87 donne la lettre B",
+                "code": "assert(printed(\"B\"), \"On attend la lettre B pour 87\")",
+                "position": 0
+              }
+            ]
+          },
+          {
+            "title": "Exercice 2 — Table de multiplication",
+            "difficulty": "facile",
+            "statement": "Affichez la table de multiplication de `7`, de 1 à 10, avec une boucle `for`.\n\nFormat attendu de chaque ligne : `7 x 1 = 7`, `7 x 2 = 14`, …, `7 x 10 = 70`.",
+            "starter": "local number = 7\n\n-- Boucle for de 1 à 10",
+            "solution": "local number = 7\n\nfor i = 1, 10 do\n    print(number .. \" x \" .. i .. \" = \" .. (number * i))\nend",
+            "hints": [
+              "Utilisez for i = 1, 10 do ... end et concaténez avec .."
+            ],
+            "position": 2,
+            "tests": [
+              {
+                "name": "Ligne \"7 x 1 = 7\"",
+                "code": "assert(printed(\"7 x 1 = 7\"), \"Ligne 7 x 1 = 7 manquante\")",
+                "position": 0
+              },
+              {
+                "name": "Ligne \"7 x 5 = 35\"",
+                "code": "assert(printed(\"7 x 5 = 35\"), \"Ligne 7 x 5 = 35 manquante\")",
+                "position": 1
+              },
+              {
+                "name": "Ligne \"7 x 10 = 70\"",
+                "code": "assert(printed(\"7 x 10 = 70\"), \"Ligne 7 x 10 = 70 manquante\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 3 — Validateur de mot de passe",
+            "difficulty": "difficile",
+            "statement": "Définissez une **fonction globale** `IsPasswordValid(password)` qui renvoie `true` seulement si le mot de passe :\n\n1. fait au moins 8 caractères\n2. contient au moins une majuscule\n3. contient au moins une minuscule\n4. contient au moins un chiffre\n\nIndice : `string.find(password, \"%u\")` détecte une majuscule, `%l` une minuscule, `%d` un chiffre.",
+            "starter": "function IsPasswordValid(password)\n    -- Renvoyez true ou false\nend\n\nprint(IsPasswordValid(\"Password123\"))",
+            "solution": "function IsPasswordValid(password)\n    if #password < 8 then return false end\n    if not string.find(password, \"%u\") then return false end\n    if not string.find(password, \"%l\") then return false end\n    if not string.find(password, \"%d\") then return false end\n    return true\nend\n\nprint(IsPasswordValid(\"Password123\"))",
+            "hints": [
+              "#password donne la longueur de la chaîne.",
+              "string.find(s, \"%d\") renvoie nil si aucun chiffre n'est présent."
+            ],
+            "position": 3,
+            "tests": [
+              {
+                "name": "\"Password123\" est valide",
+                "code": "assert(IsPasswordValid(\"Password123\") == true, \"Devrait être valide\")",
+                "position": 0
+              },
+              {
+                "name": "\"abc\" est trop court",
+                "code": "assert(IsPasswordValid(\"abc\") == false, \"Trop court : devrait être invalide\")",
+                "position": 1
+              },
+              {
+                "name": "\"password123\" sans majuscule",
+                "code": "assert(IsPasswordValid(\"password123\") == false, \"Pas de majuscule : invalide\")",
+                "position": 2
+              },
+              {
+                "name": "\"Password\" sans chiffre",
+                "code": "assert(IsPasswordValid(\"Password\") == false, \"Pas de chiffre : invalide\")",
+                "position": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapitre 3 — Tables, le cœur de Lua",
+        "summary": "Tableaux, dictionnaires et introduction aux métatables.",
+        "position": 2,
+        "lessons": [
+          {
+            "title": "Cours",
+            "content": "# Chapitre 3 — Les tables, le cœur de Lua\r\n\r\n## Objectifs du chapitre\r\n\r\nÀ la fin de ce chapitre, vous serez capable de :\r\n\r\n- Créer et manipuler des tables\r\n- Utiliser les tables comme **tableaux** (listes indexées)\r\n- Utiliser les tables comme **dictionnaires / objets** (clé → valeur)\r\n- Parcourir une table avec `ipairs` et `pairs`\r\n- Utiliser la bibliothèque `table` (`insert`, `remove`, `sort`, `concat`)\r\n- Comprendre les bases des **métatables** et de `__index`\r\n\r\n## 1. Pourquoi les tables ?\r\n\r\nEn Lua, la **table** est la **seule** structure de données composée. Tout ce qui contient\r\n« plusieurs choses » est une table : une liste de joueurs, l'inventaire d'un personnage,\r\nla configuration d'une ressource FiveM… Une table peut servir à la fois de **tableau**\r\n(éléments numérotés) et de **dictionnaire** (paires clé → valeur).\r\n\r\n```lua\r\nlocal emptyTable = {}\r\nprint(type(emptyTable)) -- table\r\n```\r\n\r\n## 2. Les tables comme tableaux (arrays)\r\n\r\n### Création et accès\r\n\r\n> ⚠️ En Lua, les tableaux commencent à l'indice **1**, pas à 0 !\r\n\r\n```lua\r\nlocal weapons = {\"pistol\", \"rifle\", \"knife\"}\r\n\r\nprint(weapons[1]) -- pistol\r\nprint(weapons[2]) -- rifle\r\nprint(weapons[3]) -- knife\r\n```\r\n\r\n### Longueur d'un tableau\r\n\r\nL'opérateur `#` donne le nombre d'éléments :\r\n\r\n```lua\r\nlocal weapons = {\"pistol\", \"rifle\", \"knife\"}\r\nprint(#weapons) -- 3\r\n```\r\n\r\n### Ajouter et retirer des éléments\r\n\r\n```lua\r\nlocal players = {\"Alice\", \"Bob\"}\r\n\r\ntable.insert(players, \"Charlie\")      -- ajoute à la fin\r\nprint(#players)                       -- 3\r\n\r\ntable.insert(players, 1, \"Zoe\")       -- insère en position 1\r\nprint(players[1])                     -- Zoe\r\n\r\ntable.remove(players)                 -- retire le dernier\r\ntable.remove(players, 1)              -- retire le premier\r\n```\r\n\r\n### Parcourir un tableau avec `ipairs`\r\n\r\n`ipairs` parcourt les éléments **dans l'ordre**, de l'indice 1 jusqu'au premier trou :\r\n\r\n```lua\r\nlocal fruits = {\"apple\", \"banana\", \"cherry\"}\r\n\r\nfor index, fruit in ipairs(fruits) do\r\n    print(index, fruit)\r\nend\r\n-- 1   apple\r\n-- 2   banana\r\n-- 3   cherry\r\n```\r\n\r\n### Trier un tableau\r\n\r\n```lua\r\nlocal scores = {42, 7, 100, 23}\r\ntable.sort(scores)                 -- ordre croissant\r\nprint(table.concat(scores, \", \"))  -- 7, 23, 42, 100\r\n\r\ntable.sort(scores, function(a, b) return a > b end) -- décroissant\r\nprint(table.concat(scores, \", \"))  -- 100, 42, 23, 7\r\n```\r\n\r\n## 3. Les tables comme dictionnaires (objets)\r\n\r\nUne table peut associer des **clés** (souvent des chaînes) à des **valeurs**. C'est ainsi\r\nqu'on représente un « objet » comme un joueur.\r\n\r\n```lua\r\nlocal player = {\r\n    name = \"Alex\",\r\n    level = 10,\r\n    money = 500,\r\n    isAdmin = false,\r\n}\r\n\r\n-- Deux notations équivalentes pour accéder à une clé :\r\nprint(player.name)      -- notation point : Alex\r\nprint(player[\"level\"])  -- notation crochets : 10\r\n```\r\n\r\n### Modifier, ajouter, supprimer une clé\r\n\r\n```lua\r\nlocal player = { name = \"Alex\", money = 500 }\r\n\r\nplayer.money = player.money + 250   -- modifier\r\nplayer.job = \"police\"               -- ajouter une nouvelle clé\r\nplayer.name = nil                   -- supprimer une clé (mettre à nil)\r\n\r\nprint(player.money) -- 750\r\nprint(player.job)   -- police\r\nprint(player.name)  -- nil\r\n```\r\n\r\n### Parcourir un dictionnaire avec `pairs`\r\n\r\n`pairs` parcourt **toutes** les paires clé/valeur (l'ordre n'est pas garanti) :\r\n\r\n```lua\r\nlocal stats = { health = 100, armor = 50, stamina = 75 }\r\n\r\nfor key, value in pairs(stats) do\r\n    print(key .. \" = \" .. value)\r\nend\r\n```\r\n\r\n> **À retenir :** `ipairs` pour les tableaux (indices 1, 2, 3…), `pairs` pour les\r\n> dictionnaires (n'importe quelles clés).\r\n\r\n## 4. Tables imbriquées\r\n\r\nUne valeur de table peut elle-même être une table. C'est la base de toute donnée\r\nstructurée dans FiveM.\r\n\r\n```lua\r\nlocal players = {\r\n    {\r\n        name = \"Alex\",\r\n        position = { x = 100.5, y = 200.0, z = 30.0 },\r\n        inventory = { \"phone\", \"water\", \"bread\" },\r\n    },\r\n    {\r\n        name = \"Sam\",\r\n        position = { x = -50.0, y = 10.0, z = 28.5 },\r\n        inventory = { \"radio\" },\r\n    },\r\n}\r\n\r\nprint(players[1].name)            -- Alex\r\nprint(players[1].position.x)      -- 100.5\r\nprint(players[1].inventory[2])    -- water\r\nprint(#players[2].inventory)      -- 1\r\n```\r\n\r\n## 5. La bibliothèque `table`\r\n\r\n| Fonction | Rôle |\r\n| --- | --- |\r\n| `table.insert(t, v)` | ajoute `v` à la fin |\r\n| `table.insert(t, pos, v)` | insère `v` à la position `pos` |\r\n| `table.remove(t)` | retire et renvoie le dernier élément |\r\n| `table.remove(t, pos)` | retire l'élément à `pos` |\r\n| `table.sort(t [, comp])` | trie sur place |\r\n| `table.concat(t, sep)` | concatène les éléments en une chaîne |\r\n\r\n```lua\r\nlocal items = {\"bread\", \"water\", \"phone\"}\r\nprint(table.concat(items, \" | \")) -- bread | water | phone\r\n```\r\n\r\n## 6. Introduction aux métatables\r\n\r\nUne **métatable** permet de définir un comportement spécial pour une table. La\r\nmétaméthode la plus courante est `__index` : elle est consultée quand on accède à une\r\n**clé absente**.\r\n\r\n```lua\r\nlocal defaults = { health = 100, armor = 0 }\r\n\r\nlocal player = setmetatable({ health = 80 }, { __index = defaults })\r\n\r\nprint(player.health) -- 80  (présent dans player)\r\nprint(player.armor)  -- 0   (absent -> récupéré dans defaults via __index)\r\n```\r\n\r\nD'autres métaméthodes existent (`__newindex`, `__add`, `__call`, `__tostring`…). Elles\r\npermettent par exemple de surcharger les opérateurs :\r\n\r\n```lua\r\nlocal Vector = {}\r\nVector.__add = function(a, b)\r\n    return setmetatable({ x = a.x + b.x, y = a.y + b.y }, Vector)\r\nend\r\n\r\nlocal v1 = setmetatable({ x = 1, y = 2 }, Vector)\r\nlocal v2 = setmetatable({ x = 3, y = 4 }, Vector)\r\nlocal sum = v1 + v2\r\nprint(sum.x, sum.y) -- 4   6\r\n```\r\n\r\n> Les métatables sont la base de la **programmation orientée objet** en Lua, que nous\r\n> approfondirons plus tard.\r\n\r\n## 7. Bonnes pratiques\r\n\r\n- Préférez `ipairs` pour les listes, `pairs` pour les dictionnaires.\r\n- Souvenez-vous que `#` n'est fiable que sur des tableaux **sans trou** (indices continus).\r\n- Pour « vider » une clé, affectez `nil` — n'utilisez pas de chaîne vide.\r\n- Une table est passée **par référence** : la modifier dans une fonction modifie l'original.\r\n\r\n```lua\r\nlocal function addBonus(stats)\r\n    stats.money = stats.money + 100 -- modifie la table d'origine\r\nend\r\n\r\nlocal player = { money = 500 }\r\naddBonus(player)\r\nprint(player.money) -- 600\r\n```\r\n\r\n## 8. Points clés à retenir\r\n\r\n1. La table est la seule structure de données composée de Lua.\r\n2. Les indices de tableau commencent à **1**.\r\n3. `#t` donne la longueur d'un tableau.\r\n4. `table.insert` / `table.remove` pour ajouter / retirer.\r\n5. `ipairs` pour les tableaux, `pairs` pour les dictionnaires.\r\n6. On supprime une clé en lui affectant `nil`.\r\n7. Les tables sont passées **par référence**.\r\n8. `setmetatable` + `__index` fournit des valeurs par défaut et la base de la POO.\r\n\r\n---\r\n\r\nPassez aux exercices pour manipuler tableaux, dictionnaires et métatables.\r\n",
+            "position": 0
+          }
+        ],
+        "exercises": [
+          {
+            "title": "Exercice 1 — Tableaux",
+            "difficulty": "facile",
+            "statement": "À partir de `local fruits = {\"apple\", \"banana\"}` :\n\n1. ajoutez `\"cherry\"` à la fin avec `table.insert`\n2. affichez le **nombre** de fruits (avec `#`)\n3. affichez chaque fruit avec une boucle `ipairs`",
+            "starter": "local fruits = {\"apple\", \"banana\"}\n\n-- 1. Ajoutez \"cherry\"   2. Affichez le nombre   3. Parcourez avec ipairs",
+            "solution": "local fruits = {\"apple\", \"banana\"}\n\ntable.insert(fruits, \"cherry\")\n\nprint(\"Count:\", #fruits)\n\nfor index, fruit in ipairs(fruits) do\n    print(index, fruit)\nend",
+            "hints": [
+              "table.insert(t, valeur) ajoute la valeur à la fin du tableau.",
+              "#fruits donne le nombre d'éléments."
+            ],
+            "position": 1,
+            "tests": [
+              {
+                "name": "Le tableau contient 3 fruits",
+                "code": "assert(printed(\"3\"), \"On attend une longueur de 3\")",
+                "position": 0
+              },
+              {
+                "name": "\"apple\" est affiché",
+                "code": "assert(printed(\"apple\"), \"apple manquant\")",
+                "position": 1
+              },
+              {
+                "name": "\"cherry\" a bien été ajouté",
+                "code": "assert(printed(\"cherry\"), \"cherry manquant\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 2 — Dictionnaires",
+            "difficulty": "moyen",
+            "statement": "La table `player` est déjà créée (`name = \"Alex\"`, `level = 10`, `money = 500`).\n\n1. affichez le **nom** et le **niveau**\n2. ajoutez `250` à `money`\n3. affichez le nouveau total (`750`)",
+            "starter": "local player = {\n    name = \"Alex\",\n    level = 10,\n    money = 500,\n}\n\n-- Affichez name et level, ajoutez 250 à money, puis affichez money",
+            "solution": "local player = {\n    name = \"Alex\",\n    level = 10,\n    money = 500,\n}\n\nprint(\"Name:\", player.name)\nprint(\"Level:\", player.level)\n\nplayer.money = player.money + 250\nprint(\"Money:\", player.money)",
+            "hints": [
+              "On accède à une clé avec player.name ou player[\"name\"]."
+            ],
+            "position": 2,
+            "tests": [
+              {
+                "name": "Le nom Alex est affiché",
+                "code": "assert(printed(\"Alex\"), \"Le nom n'apparaît pas\")",
+                "position": 0
+              },
+              {
+                "name": "Le niveau 10 est affiché",
+                "code": "assert(printed(\"10\"), \"Le niveau n'apparaît pas\")",
+                "position": 1
+              },
+              {
+                "name": "Le nouveau total est 750",
+                "code": "assert(printed(\"750\"), \"On attend money = 750\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 3 — Somme d'un tableau",
+            "difficulty": "moyen",
+            "statement": "Écrivez une **fonction globale** `SumTable(numbers)` qui renvoie la somme de tous\nles nombres du tableau `numbers`. Un tableau vide doit renvoyer `0`.\n\nIndice : parcourez le tableau avec `ipairs` et accumulez le total.",
+            "starter": "function SumTable(numbers)\n    -- Renvoyez la somme des éléments\nend\n\nprint(SumTable({1, 2, 3, 4}))",
+            "solution": "function SumTable(numbers)\n    local total = 0\n    for _, n in ipairs(numbers) do\n        total = total + n\n    end\n    return total\nend\n\nprint(SumTable({1, 2, 3, 4}))",
+            "hints": [
+              "Initialisez total à 0 avant la boucle, puis total = total + n."
+            ],
+            "position": 3,
+            "tests": [
+              {
+                "name": "SumTable({1,2,3,4}) == 10",
+                "code": "assert(SumTable({1, 2, 3, 4}) == 10, \"Somme attendue : 10\")",
+                "position": 0
+              },
+              {
+                "name": "SumTable({}) == 0",
+                "code": "assert(SumTable({}) == 0, \"Un tableau vide doit donner 0\")",
+                "position": 1
+              },
+              {
+                "name": "SumTable({10,-5}) == 5",
+                "code": "assert(SumTable({10, -5}) == 5, \"Somme attendue : 5\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 4 — Inventaire",
+            "difficulty": "difficile",
+            "statement": "Un inventaire est une table dictionnaire de la forme `{ item = quantity }`.\n\nÉcrivez deux **fonctions globales** :\n\n- `CountItems(inventory)` → le nombre **total** d'objets (somme des quantités)\n- `HasItem(inventory, name)` → `true` si l'objet existe et que sa quantité est > 0, sinon `false`\n\nIndice : parcourez un dictionnaire avec `pairs`.",
+            "starter": "function CountItems(inventory)\n    -- Somme des quantités\nend\n\nfunction HasItem(inventory, name)\n    -- true / false\nend",
+            "solution": "function CountItems(inventory)\n    local total = 0\n    for _, quantity in pairs(inventory) do\n        total = total + quantity\n    end\n    return total\nend\n\nfunction HasItem(inventory, name)\n    return inventory[name] ~= nil and inventory[name] > 0\nend",
+            "hints": [
+              "pairs(t) parcourt toutes les paires clé/valeur d'un dictionnaire.",
+              "Pour HasItem, testez inventory[name] ~= nil."
+            ],
+            "position": 4,
+            "tests": [
+              {
+                "name": "CountItems({bread=2, water=5}) == 7",
+                "code": "assert(CountItems({bread = 2, water = 5}) == 7, \"Total attendu : 7\")",
+                "position": 0
+              },
+              {
+                "name": "CountItems({}) == 0",
+                "code": "assert(CountItems({}) == 0, \"Inventaire vide : 0\")",
+                "position": 1
+              },
+              {
+                "name": "HasItem trouve \"bread\"",
+                "code": "assert(HasItem({bread = 2}, \"bread\") == true, \"bread devrait être présent\")",
+                "position": 2
+              },
+              {
+                "name": "HasItem ne trouve pas \"gold\"",
+                "code": "assert(HasItem({bread = 2}, \"gold\") == false, \"gold ne devrait pas être présent\")",
+                "position": 3
+              }
+            ]
+          },
+          {
+            "title": "Exercice 5 — Métatables et valeurs par défaut",
+            "difficulty": "difficile",
+            "statement": "Écrivez une **fonction globale** `WithDefaults(t, defaults)` qui renvoie la table `t`\nconfigurée de sorte que l'accès à une **clé absente** de `t` renvoie la valeur\ncorrespondante dans `defaults`.\n\nIndice : utilisez `setmetatable(t, { __index = defaults })`.",
+            "starter": "function WithDefaults(t, defaults)\n    -- Associez une métatable avec __index\nend",
+            "solution": "function WithDefaults(t, defaults)\n    return setmetatable(t, { __index = defaults })\nend",
+            "hints": [
+              "__index peut être une table : les clés manquantes y sont cherchées.",
+              "setmetatable renvoie la table passée en premier argument."
+            ],
+            "position": 5,
+            "tests": [
+              {
+                "name": "La valeur propre est conservée (hp = 80)",
+                "code": "assert(WithDefaults({hp = 80}, {hp = 100, armor = 50}).hp == 80, \"hp propre doit valoir 80\")",
+                "position": 0
+              },
+              {
+                "name": "La valeur par défaut est utilisée (armor = 50)",
+                "code": "assert(WithDefaults({hp = 80}, {hp = 100, armor = 50}).armor == 50, \"armor doit venir des defaults\")",
+                "position": 1
+              },
+              {
+                "name": "Clé totalement absente -> défaut",
+                "code": "local s = WithDefaults({}, {speed = 5}); assert(s.speed == 5, \"speed doit valoir 5\")",
+                "position": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slug": "m2",
+    "title": "Module 2 — Programmation avancée",
+    "summary": "Fonctions, chaînes de caractères et modules.",
+    "priceCents": 4900,
+    "currency": "eur",
+    "published": true,
+    "position": 1,
+    "chapters": [
+      {
+        "title": "Chapitre 4 — Fonctions",
+        "summary": "Paramètres, retours multiples, closures, fonctions variadiques.",
+        "position": 0,
+        "lessons": [
+          {
+            "title": "Cours",
+            "content": "# Chapitre 4 — Les fonctions\r\n\r\n## Objectifs du chapitre\r\n\r\nÀ la fin de ce chapitre, vous serez capable de :\r\n\r\n- Définir et appeler des fonctions\r\n- Passer des paramètres et renvoyer une ou plusieurs valeurs\r\n- Gérer des arguments par défaut\r\n- Écrire des fonctions anonymes et les passer en argument (callbacks)\r\n- Comprendre et utiliser les **closures**\r\n- Écrire des fonctions **variadiques** (`...`)\r\n\r\n## 1. Définir et appeler une fonction\r\n\r\nUne fonction regroupe un bloc de code réutilisable. Comme pour les variables, on respecte\r\nles conventions : `camelCase` pour les fonctions **locales**, `PascalCase` pour les\r\nfonctions **globales**.\r\n\r\n```lua\r\n-- Fonction locale (recommandée)\r\nlocal function sayHello()\r\n    print(\"Hello!\")\r\nend\r\n\r\nsayHello() -- Hello!\r\n\r\n-- Fonction globale\r\nfunction GetServerName()\r\n    return \"Los Santos RP\"\r\nend\r\n\r\nprint(GetServerName()) -- Los Santos RP\r\n```\r\n\r\nOn peut aussi stocker une fonction dans une variable (les fonctions sont des **valeurs**) :\r\n\r\n```lua\r\nlocal greet = function()\r\n    print(\"Hi there!\")\r\nend\r\n\r\ngreet()\r\n```\r\n\r\n## 2. Paramètres et arguments\r\n\r\nLes **paramètres** sont les variables déclarées entre parenthèses ; les **arguments**\r\nsont les valeurs réellement passées lors de l'appel.\r\n\r\n```lua\r\nlocal function greet(name)\r\n    print(\"Hello \" .. name .. \"!\")\r\nend\r\n\r\ngreet(\"Alex\")  -- Hello Alex!\r\ngreet(\"Sam\")   -- Hello Sam!\r\n```\r\n\r\nPlusieurs paramètres se séparent par des virgules :\r\n\r\n```lua\r\nlocal function add(a, b)\r\n    print(a + b)\r\nend\r\n\r\nadd(3, 5) -- 8\r\n```\r\n\r\n> Si vous appelez une fonction avec **moins** d'arguments que de paramètres, les\r\n> paramètres manquants valent `nil`. S'il y en a **trop**, les excédentaires sont ignorés.\r\n\r\n## 3. Valeurs de retour\r\n\r\nLe mot-clé `return` renvoie une valeur à l'appelant :\r\n\r\n```lua\r\nlocal function square(n)\r\n    return n * n\r\nend\r\n\r\nlocal result = square(6)\r\nprint(result) -- 36\r\n```\r\n\r\n### Retours multiples\r\n\r\nParticularité de Lua : une fonction peut renvoyer **plusieurs valeurs** à la fois.\r\n\r\n```lua\r\nlocal function minMax(a, b)\r\n    if a <= b then\r\n        return a, b\r\n    else\r\n        return b, a\r\n    end\r\nend\r\n\r\nlocal low, high = minMax(8, 3)\r\nprint(low, high) -- 3   8\r\n```\r\n\r\n## 4. Arguments par défaut\r\n\r\nLua n'a pas de syntaxe dédiée, mais l'idiome `valeur or défaut` fait le travail :\r\n\r\n```lua\r\nlocal function createPlayer(name, health)\r\n    health = health or 100  -- si health est nil, on utilise 100\r\n    return { name = name, health = health }\r\nend\r\n\r\nlocal p1 = createPlayer(\"Alex\")       -- health = 100\r\nlocal p2 = createPlayer(\"Sam\", 50)    -- health = 50\r\nprint(p1.health, p2.health)           -- 100   50\r\n```\r\n\r\n> ⚠️ Attention : `x or défaut` remplace aussi `false`. Pour un booléen optionnel,\r\n> testez explicitement `if x == nil then`.\r\n\r\n## 5. Fonctions anonymes et callbacks\r\n\r\nUne fonction sans nom est dite **anonyme**. Comme les fonctions sont des valeurs, on peut\r\nles passer en argument d'une autre fonction : c'est le principe des **callbacks**, omniprésent\r\ndans FiveM (gestion d'événements).\r\n\r\n```lua\r\nlocal function repeatTimes(count, action)\r\n    for i = 1, count do\r\n        action(i)\r\n    end\r\nend\r\n\r\n-- On passe une fonction anonyme comme argument\r\nrepeatTimes(3, function(i)\r\n    print(\"Tick \" .. i)\r\nend)\r\n-- Tick 1\r\n-- Tick 2\r\n-- Tick 3\r\n```\r\n\r\nOn peut aussi stocker des fonctions dans une table (utile pour un routeur d'événements) :\r\n\r\n```lua\r\nlocal handlers = {\r\n    onJoin = function(name) print(name .. \" joined\") end,\r\n    onLeave = function(name) print(name .. \" left\") end,\r\n}\r\n\r\nhandlers.onJoin(\"Alex\")  -- Alex joined\r\n```\r\n\r\n## 6. Les closures\r\n\r\nUne **closure** est une fonction qui « capture » les variables locales de l'environnement\r\noù elle a été créée — et garde accès à ces variables même après.\r\n\r\n```lua\r\nlocal function makeCounter()\r\n    local count = 0          -- variable capturée\r\n    return function()\r\n        count = count + 1\r\n        return count\r\n    end\r\nend\r\n\r\nlocal next = makeCounter()\r\nprint(next()) -- 1\r\nprint(next()) -- 2\r\nprint(next()) -- 3\r\n\r\n-- Chaque compteur a son propre état :\r\nlocal other = makeCounter()\r\nprint(other()) -- 1\r\n```\r\n\r\nLes closures servent à créer de l'**état privé** sans variable globale.\r\n\r\n## 7. Fonctions variadiques (`...`)\r\n\r\nLe symbole `...` permet d'accepter un nombre **variable** d'arguments.\r\n\r\n```lua\r\nlocal function printAll(...)\r\n    for i = 1, select('#', ...) do\r\n        print(i, (select(i, ...)))\r\n    end\r\nend\r\n\r\nprintAll(\"a\", \"b\", \"c\")\r\n-- 1   a\r\n-- 2   b\r\n-- 3   c\r\n```\r\n\r\n- `select('#', ...)` renvoie le **nombre** d'arguments,\r\n- `select(i, ...)` renvoie les arguments à partir de la position `i`,\r\n- `{...}` regroupe les arguments dans une table.\r\n\r\n```lua\r\nlocal function sum(...)\r\n    local total = 0\r\n    for i = 1, select('#', ...) do\r\n        total = total + select(i, ...)\r\n    end\r\n    return total\r\nend\r\n\r\nprint(sum(1, 2, 3, 4)) -- 10\r\nprint(sum())           -- 0\r\n```\r\n\r\n## 8. Récursivité\r\n\r\nUne fonction peut s'appeler elle-même. Pensez toujours à un **cas d'arrêt** !\r\n\r\n```lua\r\nlocal function factorial(n)\r\n    if n <= 1 then\r\n        return 1            -- cas d'arrêt\r\n    end\r\n    return n * factorial(n - 1)\r\nend\r\n\r\nprint(factorial(5)) -- 120\r\n```\r\n\r\n## 9. Bonnes pratiques\r\n\r\n- Une fonction = **une responsabilité** ; un nom clair (verbe d'action).\r\n- Préférez `local function` ; ne passez en global que ce qui doit l'être.\r\n- Renvoyez tôt (`return`) pour éviter les `if` profondément imbriqués.\r\n- Documentez les paramètres attendus si la fonction est exposée.\r\n\r\n## 10. Points clés à retenir\r\n\r\n1. `local function` (camelCase) vs `function` globale (PascalCase).\r\n2. Les fonctions sont des **valeurs** : stockables, passables en argument.\r\n3. `return` peut renvoyer **plusieurs valeurs**.\r\n4. Arguments par défaut via l'idiome `x = x or défaut`.\r\n5. Les **callbacks** = fonctions passées en argument.\r\n6. Une **closure** capture les variables locales de son environnement.\r\n7. `...` + `select('#', ...)` pour les fonctions variadiques.\r\n8. La récursivité exige un cas d'arrêt.\r\n\r\n---\r\n\r\nPassez aux exercices : définition, retours multiples, variadiques et closures.\r\n",
+            "position": 0
+          }
+        ],
+        "exercises": [
+          {
+            "title": "Exercice 1 — Définir une fonction",
+            "difficulty": "facile",
+            "statement": "Écrivez une **fonction globale** `Greet(name)` qui **renvoie** (avec `return`)\nla chaîne `Hello <name>!`.\n\nExemple : `Greet(\"Alex\")` doit renvoyer `Hello Alex!`.",
+            "starter": "function Greet(name)\n    -- Renvoyez la chaîne de bienvenue\nend\n\nprint(Greet(\"Alex\"))",
+            "solution": "function Greet(name)\n    return \"Hello \" .. name .. \"!\"\nend\n\nprint(Greet(\"Alex\"))",
+            "hints": [
+              "Utilisez return et la concaténation : \"Hello \" .. name .. \"!\""
+            ],
+            "position": 1,
+            "tests": [
+              {
+                "name": "Greet(\"Alex\") == \"Hello Alex!\"",
+                "code": "assert(Greet(\"Alex\") == \"Hello Alex!\", \"Résultat attendu : Hello Alex!\")",
+                "position": 0
+              },
+              {
+                "name": "Greet(\"Sam\") == \"Hello Sam!\"",
+                "code": "assert(Greet(\"Sam\") == \"Hello Sam!\", \"Résultat attendu : Hello Sam!\")",
+                "position": 1
+              }
+            ]
+          },
+          {
+            "title": "Exercice 2 — Retours multiples",
+            "difficulty": "moyen",
+            "statement": "Écrivez une **fonction globale** `MinMax(a, b)` qui renvoie **deux valeurs** :\nd'abord le plus petit des deux nombres, puis le plus grand.\n\nExemple : `local lo, hi = MinMax(8, 3)` doit donner `lo = 3` et `hi = 8`.",
+            "starter": "function MinMax(a, b)\n    -- Renvoyez le minimum puis le maximum\nend\n\nprint(MinMax(8, 3))",
+            "solution": "function MinMax(a, b)\n    if a <= b then\n        return a, b\n    else\n        return b, a\n    end\nend\n\nprint(MinMax(8, 3))",
+            "hints": [
+              "On renvoie plusieurs valeurs en les séparant par une virgule : return a, b"
+            ],
+            "position": 2,
+            "tests": [
+              {
+                "name": "MinMax(3, 8) -> 3, 8",
+                "code": "local lo, hi = MinMax(3, 8); assert(lo == 3 and hi == 8, \"Attendu : 3, 8\")",
+                "position": 0
+              },
+              {
+                "name": "MinMax(10, 2) -> 2, 10",
+                "code": "local lo, hi = MinMax(10, 2); assert(lo == 2 and hi == 10, \"Attendu : 2, 10\")",
+                "position": 1
+              },
+              {
+                "name": "MinMax(5, 5) -> 5, 5",
+                "code": "local lo, hi = MinMax(5, 5); assert(lo == 5 and hi == 5, \"Attendu : 5, 5\")",
+                "position": 2
+              }
+            ]
+          },
+          {
+            "title": "Exercice 3 — Arguments par défaut",
+            "difficulty": "moyen",
+            "statement": "Écrivez une **fonction globale** `CreatePlayer(name, health)` qui renvoie une table\n`{ name = ..., health = ... }`.\n\nSi `health` n'est pas fourni (`nil`), utilisez **100** par défaut.",
+            "starter": "function CreatePlayer(name, health)\n    -- Renvoyez une table avec name et health (défaut 100)\nend",
+            "solution": "function CreatePlayer(name, health)\n    health = health or 100\n    return { name = name, health = health }\nend",
+            "hints": [
+              "Idiome : health = health or 100"
+            ],
+            "position": 3,
+            "tests": [
+              {
+                "name": "Sans health -> 100",
+                "code": "local p = CreatePlayer(\"Alex\"); assert(p.name == \"Alex\" and p.health == 100, \"health par défaut doit valoir 100\")",
+                "position": 0
+              },
+              {
+                "name": "Avec health = 50",
+                "code": "local p = CreatePlayer(\"Sam\", 50); assert(p.health == 50, \"health fourni doit valoir 50\")",
+                "position": 1
+              }
+            ]
+          },
+          {
+            "title": "Exercice 4 — Fonction variadique",
+            "difficulty": "moyen",
+            "statement": "Écrivez une **fonction globale** `Sum(...)` qui renvoie la somme de **tous** ses\narguments, quel que soit leur nombre. `Sum()` (sans argument) doit renvoyer `0`.\n\nIndice : `select('#', ...)` donne le nombre d'arguments ; `select(i, ...)` renvoie\nl'argument en position `i`.",
+            "starter": "function Sum(...)\n    -- Additionnez tous les arguments\nend\n\nprint(Sum(1, 2, 3, 4))",
+            "solution": "function Sum(...)\n    local total = 0\n    for i = 1, select('#', ...) do\n        total = total + select(i, ...)\n    end\n    return total\nend\n\nprint(Sum(1, 2, 3, 4))",
+            "hints": [
+              "Bouclez de 1 à select('#', ...) et ajoutez select(i, ...) au total."
+            ],
+            "position": 4,
+            "tests": [
+              {
+                "name": "Sum(1, 2, 3) == 6",
+                "code": "assert(Sum(1, 2, 3) == 6, \"Attendu : 6\")",
+                "position": 0
+              },
+              {
+                "name": "Sum() == 0",
+                "code": "assert(Sum() == 0, \"Sans argument : 0\")",
+                "position": 1
+              },
+              {
+                "name": "Sum(10, -2, 5) == 13",
+                "code": "assert(Sum(10, -2, 5) == 13, \"Attendu : 13\")",
+                "position": 2
+              },
+              {
+                "name": "Sum(7) == 7",
+                "code": "assert(Sum(7) == 7, \"Attendu : 7\")",
+                "position": 3
+              }
+            ]
+          },
+          {
+            "title": "Exercice 5 — Closures",
+            "difficulty": "difficile",
+            "statement": "Écrivez une **fonction globale** `MakeCounter()` qui renvoie une **fonction**.\nChaque appel de la fonction renvoyée donne l'entier suivant, en commençant à `1`\n(1, puis 2, puis 3…).\n\nDeux compteurs créés séparément doivent être **indépendants**.",
+            "starter": "function MakeCounter()\n    -- Renvoyez une fonction qui compte 1, 2, 3, ...\nend\n\nlocal count = MakeCounter()\nprint(count())\nprint(count())",
+            "solution": "function MakeCounter()\n    local count = 0\n    return function()\n        count = count + 1\n        return count\n    end\nend\n\nlocal count = MakeCounter()\nprint(count())\nprint(count())",
+            "hints": [
+              "Déclarez une variable locale count AVANT de renvoyer la fonction.",
+              "La fonction renvoyée capture (closure) cette variable count."
+            ],
+            "position": 5,
+            "tests": [
+              {
+                "name": "Compte 1, 2, 3",
+                "code": "local c = MakeCounter(); assert(c() == 1 and c() == 2 and c() == 3, \"Le compteur doit donner 1, 2, 3\")",
+                "position": 0
+              },
+              {
+                "name": "Compteurs indépendants",
+                "code": "local a = MakeCounter(); local b = MakeCounter(); a(); a(); assert(b() == 1, \"Chaque compteur a son propre état\")",
+                "position": 1
+              }
+            ]
+          },
+          {
+            "title": "Exercice 6 — Fonction d'ordre supérieur",
+            "difficulty": "difficile",
+            "statement": "Écrivez une **fonction globale** `ApplyToAll(numbers, fn)` qui renvoie un **nouveau**\ntableau contenant `fn` appliquée à chaque élément de `numbers`.\n\nExemple : `ApplyToAll({1, 2, 3}, function(x) return x * 2 end)` renvoie `{2, 4, 6}`.",
+            "starter": "function ApplyToAll(numbers, fn)\n    -- Renvoyez un nouveau tableau avec fn appliquée à chaque élément\nend",
+            "solution": "function ApplyToAll(numbers, fn)\n    local result = {}\n    for i, n in ipairs(numbers) do\n        result[i] = fn(n)\n    end\n    return result\nend",
+            "hints": [
+              "Créez un tableau result vide, parcourez numbers avec ipairs.",
+              "Appelez fn(n) et stockez le résultat dans result[i]."
+            ],
+            "position": 6,
+            "tests": [
+              {
+                "name": "Double chaque élément",
+                "code": "local r = ApplyToAll({1, 2, 3}, function(x) return x * 2 end); assert(r[1] == 2 and r[2] == 4 and r[3] == 6, \"Attendu : {2, 4, 6}\")",
+                "position": 0
+              },
+              {
+                "name": "Met au carré",
+                "code": "local r = ApplyToAll({2, 3, 4}, function(x) return x * x end); assert(r[1] == 4 and r[2] == 9 and r[3] == 16, \"Attendu : {4, 9, 16}\")",
+                "position": 1
+              },
+              {
+                "name": "Tableau vide",
+                "code": "local r = ApplyToAll({}, function(x) return x end); assert(#r == 0, \"Un tableau vide doit donner un tableau vide\")",
+                "position": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Chapitre 5 — Gestion des chaînes",
+        "summary": "Patterns, formatage, bibliothèque string.",
+        "position": 1,
+        "lessons": [],
+        "exercises": []
+      },
+      {
+        "title": "Chapitre 6 — Modules et packages",
+        "summary": "require(), organisation du code.",
+        "position": 2,
+        "lessons": [],
+        "exercises": []
+      }
+    ]
+  },
+  {
+    "slug": "m3",
+    "title": "Module 3 — Concepts avancés",
+    "summary": "Métaprogrammation, coroutines et gestion d'erreurs.",
+    "priceCents": 4900,
+    "currency": "eur",
+    "published": true,
+    "position": 2,
+    "chapters": [
+      {
+        "title": "Chapitre 7 — Métatables et POO",
+        "summary": "__index, __newindex, surcharge d'opérateurs.",
+        "position": 0,
+        "lessons": [],
+        "exercises": []
+      },
+      {
+        "title": "Chapitre 8 — Coroutines",
+        "summary": "create, resume, yield.",
+        "position": 1,
+        "lessons": [],
+        "exercises": []
+      },
+      {
+        "title": "Chapitre 9 — Gestion d'erreurs",
+        "summary": "pcall, xpcall, débogage.",
+        "position": 2,
+        "lessons": [],
+        "exercises": []
+      }
+    ]
+  },
+  {
+    "slug": "m4",
+    "title": "Module 4 — Préparation à FiveM",
+    "summary": "Architecture client-serveur, natives et projet pratique.",
+    "priceCents": 4900,
+    "currency": "eur",
+    "published": true,
+    "position": 3,
+    "chapters": [
+      {
+        "title": "Chapitre 10 — Lua dans FiveM",
+        "summary": "Architecture, événements, ressources.",
+        "position": 0,
+        "lessons": [],
+        "exercises": []
+      },
+      {
+        "title": "Chapitre 11 — Natives et API FiveM",
+        "summary": "Natives GTA V, CitizenFX, NUI.",
+        "position": 1,
+        "lessons": [],
+        "exercises": []
+      },
+      {
+        "title": "Chapitre 12 — Projet pratique",
+        "summary": "Création d'une ressource complète.",
+        "position": 2,
+        "lessons": [],
+        "exercises": []
+      }
+    ]
+  }
+]

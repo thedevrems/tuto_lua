@@ -10,3 +10,7 @@
 
 # Local environment overrides
 .env
+
+# Stray test/output artifacts
+test_out.txt
+*.out

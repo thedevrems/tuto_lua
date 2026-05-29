@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS exercises (
   statement  TEXT NOT NULL DEFAULT '',
   starter    TEXT NOT NULL DEFAULT '',
   solution   TEXT NOT NULL DEFAULT '',
+  hints      TEXT NOT NULL DEFAULT '[]',
   position   INTEGER NOT NULL DEFAULT 0
 );
 

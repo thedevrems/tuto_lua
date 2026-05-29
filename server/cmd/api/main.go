@@ -17,6 +17,7 @@ import (
 	"github.com/thedevrems/tuto_lua/server/internal/database"
 	"github.com/thedevrems/tuto_lua/server/internal/handlers"
 	"github.com/thedevrems/tuto_lua/server/internal/router"
+	"github.com/thedevrems/tuto_lua/server/internal/seed"
 	"github.com/thedevrems/tuto_lua/server/internal/store"
 	"github.com/thedevrems/tuto_lua/server/internal/token"
 )
@@ -39,8 +40,11 @@ func run() error {
 	}
 	defer db.Close()
 
-	handler := buildRouter(cfg, store.New(db))
-	return serve(cfg.Port, handler)
+	st := store.New(db)
+	if err := seed.Run(st); err != nil {
+		return err
+	}
+	return serve(cfg.Port, buildRouter(cfg, st))
 }
 
 // openDatabase opens the connection and applies the schema once.
@@ -64,6 +68,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 	return router.New(router.Deps{
 		AllowedOrigin: cfg.AllowedOrigin,
 		Auth:          handlers.NewAuthHandler(authSvc),
+		Courses:       handlers.NewCourseHandler(st),
 		Guard:         guard,
 	})
 }
