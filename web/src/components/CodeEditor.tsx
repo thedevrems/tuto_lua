@@ -11,36 +11,36 @@ interface Props {
   minHeight?: string
 }
 
-// Monochrome editor theme (black & white).
+// Light monochrome editor theme (charte graphique: black & white).
 const monoTheme = EditorView.theme(
   {
-    '&': { color: '#ededf0', backgroundColor: 'transparent', height: '100%' },
-    '.cm-content': { caretColor: '#ffffff', padding: '12px 0' },
-    '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#ffffff' },
+    '&': { color: '#171717', backgroundColor: 'transparent', height: '100%' },
+    '.cm-content': { caretColor: '#0a0a0a', padding: '12px 0' },
+    '.cm-cursor, .cm-dropCursor': { borderLeftColor: '#0a0a0a' },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-      backgroundColor: '#33333b',
+      backgroundColor: '#e5e5e5',
     },
-    '.cm-gutters': { backgroundColor: 'transparent', color: '#5b5b66', border: 'none' },
-    '.cm-activeLine': { backgroundColor: 'rgba(255,255,255,0.025)' },
-    '.cm-activeLineGutter': { backgroundColor: 'transparent', color: '#b4b4bd' },
+    '.cm-gutters': { backgroundColor: 'transparent', color: '#a3a3a3', border: 'none' },
+    '.cm-activeLine': { backgroundColor: 'rgba(0,0,0,0.025)' },
+    '.cm-activeLineGutter': { backgroundColor: 'transparent', color: '#525252' },
     '.cm-lineNumbers .cm-gutterElement': { padding: '0 12px 0 8px' },
-    '.cm-selectionMatch': { backgroundColor: '#2a2a31' },
+    '.cm-selectionMatch': { backgroundColor: '#f5f5f5' },
     '.cm-matchingBracket, &.cm-focused .cm-matchingBracket': {
-      backgroundColor: '#3a3a42',
+      backgroundColor: '#e5e5e5',
       outline: 'none',
     },
   },
-  { dark: true },
+  { dark: false },
 )
 
-// Grayscale syntax highlighting for Lua tokens.
+// Grayscale syntax highlighting for Lua tokens (charte: monochrome).
 const monoHighlight = EditorView.theme({
-  '.tok-keyword': { color: '#ffffff', fontWeight: '600' },
-  '.tok-operator': { color: '#b4b4bd' },
-  '.tok-string': { color: '#b4b4bd' },
-  '.tok-number': { color: '#d6d6dc' },
-  '.tok-comment': { color: '#5b5b66', fontStyle: 'italic' },
-  '.tok-variableName': { color: '#ededf0' },
+  '.tok-keyword': { color: '#0a0a0a', fontWeight: '600' },
+  '.tok-operator': { color: '#525252' },
+  '.tok-string': { color: '#525252' },
+  '.tok-number': { color: '#404040' },
+  '.tok-comment': { color: '#a3a3a3', fontStyle: 'italic' },
+  '.tok-variableName': { color: '#171717' },
 })
 
 export default function CodeEditor({ value, onChange, readOnly = false, minHeight = '180px' }: Props) {

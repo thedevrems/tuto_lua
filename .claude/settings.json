@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go version *)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(gh --version)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\guibe\\.claude\\projects\\c--Users-guibe-OneDrive-Bureau-tuto-lua\\memory"
+    ]
+  }
+}

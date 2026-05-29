@@ -1,11 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ================================================================== */
+/*  Design tokens — see CHARTE-GRAPHIQUE.md                           */
+/* ================================================================== */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+
+  --color-black: #0a0a0a;
+  --color-black-soft: #1a1a1a;
+  --color-black-muted: #2a2a2a;
+  --color-white: #ffffff;
+  --color-white-soft: #fafafa;
+
+  --color-border: #e5e5e5;
+  --color-border-hover: #a3a3a3;
+  --color-text: #0a0a0a;
+  --color-text-secondary: #525252;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  --transition-fast: 150ms;
+  --transition-base: 250ms;
 }
 
 html,
@@ -15,146 +40,143 @@ body,
 }
 
 body {
-  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  @apply bg-white text-black font-sans antialiased;
   margin: 0;
 }
 
-/* Thin monochrome scrollbars */
+/* Thin monochrome scrollbars (light) */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #3a3a42 transparent;
+  scrollbar-color: #d4d4d4 transparent;
 }
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #2c2c33;
+  background: #d4d4d4;
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #44444d;
+  background: #a3a3a3;
   background-clip: content-box;
 }
 
-/* ---------------------------------------------------------------- */
-/*  Rendered markdown (lesson + exercise statements)                */
-/* ---------------------------------------------------------------- */
+/* ================================================================== */
+/*  Reusable components (charte graphique)                            */
+/* ================================================================== */
+@layer components {
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border-2 border-transparent
+           px-6 py-3 text-base font-medium leading-none transition-all duration-base ease-smooth
+           disabled:opacity-50 disabled:pointer-events-none focus-visible:outline focus-visible:outline-2
+           focus-visible:outline-offset-2 focus-visible:outline-black;
+  }
+  .btn-sm { @apply px-4 py-2 text-sm; }
+  .btn-lg { @apply px-8 py-4 text-lg; }
+
+  .btn-primary { @apply bg-black text-white border-black hover:bg-black-muted hover:border-black-muted hover:-translate-y-px; }
+  .btn-secondary { @apply bg-transparent text-black border-black hover:bg-black hover:text-white; }
+  .btn-ghost { @apply bg-transparent text-black border-transparent hover:bg-gray-100; }
+  .btn-danger { @apply bg-danger text-white border-danger hover:bg-[#b91c1c] hover:border-[#b91c1c]; }
+
+  /* Card */
+  .card {
+    @apply bg-white border-2 border-gray-200 rounded-lg p-6 shadow-sm transition-all duration-base ease-smooth;
+  }
+  .card-interactive { @apply hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5; }
+
+  /* Form controls */
+  .label { @apply block text-sm font-medium text-black mb-2; }
+  .input {
+    @apply w-full rounded-md border-2 border-gray-200 bg-white px-4 py-3 text-base text-black
+           placeholder:text-gray-500 transition-all duration-fast
+           hover:border-gray-300 focus:border-black focus:outline-none
+           focus:shadow-[0_0_0_3px_rgba(10,10,10,0.1)];
+  }
+  .input-error { @apply border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgba(220,38,38,0.1)]; }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-black;
+  }
+  .badge-success { @apply bg-success-bg text-success border border-success-border; }
+  .badge-danger { @apply bg-danger-bg text-danger border border-danger-border; }
+  .badge-warning { @apply bg-warning-bg text-warning border border-warning-border; }
+
+  /* Layout */
+  .container-page { @apply w-full max-w-container mx-auto px-6; }
+}
+
+/* ================================================================== */
+/*  Rendered markdown (lesson + exercise statements) — light theme    */
+/* ================================================================== */
 .prose-lua {
-  @apply text-ink-200 leading-relaxed;
+  @apply text-gray-700 leading-relaxed;
 }
-.prose-lua h1 {
-  @apply text-2xl font-bold text-white mt-0 mb-4 tracking-tight;
-}
-.prose-lua h2 {
-  @apply text-xl font-semibold text-white mt-8 mb-3 pb-2 border-b border-ink-800 tracking-tight;
-}
-.prose-lua h3 {
-  @apply text-base font-semibold text-ink-100 mt-6 mb-2;
-}
-.prose-lua h4 {
-  @apply text-sm font-semibold text-ink-200 mt-4 mb-1 uppercase tracking-wide;
-}
-.prose-lua p {
-  @apply my-3;
-}
-.prose-lua ul {
-  @apply my-3 ml-5 list-disc space-y-1;
-}
-.prose-lua ol {
-  @apply my-3 ml-5 list-decimal space-y-1;
-}
-.prose-lua li {
-  @apply pl-1;
-}
-.prose-lua a {
-  @apply text-white underline underline-offset-2 decoration-ink-600 hover:decoration-white;
-}
-.prose-lua strong {
-  @apply text-white font-semibold;
-}
-.prose-lua blockquote {
-  @apply border-l-2 border-ink-600 pl-4 italic text-ink-300 my-4;
-}
-.prose-lua hr {
-  @apply border-ink-800 my-6;
-}
-.prose-lua table {
-  @apply w-full text-sm my-4 border-collapse;
-}
+.prose-lua h1 { @apply text-3xl font-black text-black mt-0 mb-4 tracking-tight; }
+.prose-lua h2 { @apply text-2xl font-bold text-black mt-8 mb-3 pb-2 border-b border-gray-200 tracking-tight; }
+.prose-lua h3 { @apply text-lg font-semibold text-black mt-6 mb-2; }
+.prose-lua h4 { @apply text-sm font-semibold text-gray-700 mt-4 mb-1 uppercase tracking-wide; }
+.prose-lua p { @apply my-3; }
+.prose-lua ul { @apply my-3 ml-5 list-disc space-y-1; }
+.prose-lua ol { @apply my-3 ml-5 list-decimal space-y-1; }
+.prose-lua li { @apply pl-1; }
+.prose-lua a { @apply text-black underline underline-offset-2 decoration-gray-400 hover:decoration-black; }
+.prose-lua strong { @apply text-black font-semibold; }
+.prose-lua blockquote { @apply border-l-2 border-gray-300 pl-4 italic text-gray-600 my-4; }
+.prose-lua hr { @apply border-gray-200 my-6; }
+.prose-lua table { @apply w-full text-sm my-4 border-collapse; }
 .prose-lua th,
-.prose-lua td {
-  @apply border border-ink-800 px-3 py-1.5 text-left;
-}
-.prose-lua th {
-  @apply bg-ink-850 text-white font-semibold;
-}
+.prose-lua td { @apply border border-gray-200 px-3 py-1.5 text-left; }
+.prose-lua th { @apply bg-gray-100 text-black font-semibold; }
 
 /* inline code */
 .prose-lua :not(pre) > code {
-  @apply font-mono text-[0.85em] bg-ink-850 text-ink-100 px-1.5 py-0.5 rounded border border-ink-800;
+  @apply font-mono text-[0.85em] bg-gray-100 text-black px-1.5 py-0.5 rounded border border-gray-200;
 }
 
-/* fenced code blocks */
+/* fenced code blocks (dark editor look inside a light page) */
 .prose-lua pre {
-  @apply font-mono text-[0.82rem] leading-relaxed bg-ink-900 border border-ink-800 rounded-lg p-4 my-4 overflow-x-auto;
+  @apply font-mono text-[0.82rem] leading-relaxed bg-black text-white rounded-lg p-4 my-4 overflow-x-auto;
 }
-.prose-lua pre code {
-  @apply bg-transparent border-0 p-0 text-ink-100;
-}
+.prose-lua pre code { @apply bg-transparent border-0 p-0 text-white; }
 
-/* ---------------------------------------------------------------- */
-/*  Grayscale syntax highlighting (highlight.js classes)            */
-/* ---------------------------------------------------------------- */
+/* ================================================================== */
+/*  Syntax highlighting in markdown code blocks (on dark bg)          */
+/* ================================================================== */
 .hljs-comment,
-.hljs-quote {
-  @apply text-ink-500 italic;
-}
+.hljs-quote { @apply text-gray-400 italic; }
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-literal,
-.hljs-built_in {
-  @apply text-white font-semibold;
-}
+.hljs-built_in { @apply text-white font-semibold; }
 .hljs-string,
 .hljs-attr,
-.hljs-template-variable {
-  @apply text-ink-300;
-}
+.hljs-template-variable { @apply text-gray-300; }
 .hljs-number,
 .hljs-symbol,
-.hljs-meta {
-  @apply text-ink-200;
-}
+.hljs-meta { @apply text-gray-200; }
 .hljs-title,
 .hljs-title.function_,
 .hljs-section,
-.hljs-name {
-  @apply text-white;
-}
+.hljs-name { @apply text-white; }
 .hljs-params,
-.hljs-variable {
-  @apply text-ink-200;
-}
-.hljs-emphasis {
-  font-style: italic;
-}
-.hljs-strong {
-  font-weight: 700;
-}
+.hljs-variable { @apply text-gray-200; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
 
-/* ---------------------------------------------------------------- */
-/*  CodeMirror tweaks                                                */
-/* ---------------------------------------------------------------- */
+/* ================================================================== */
+/*  CodeMirror editor                                                 */
+/* ================================================================== */
 .cm-editor {
   @apply text-[0.85rem] h-full;
   background: transparent;
 }
-.cm-editor.cm-focused {
-  outline: none;
-}
+.cm-editor.cm-focused { outline: none; }
 .cm-scroller {
   font-family: 'JetBrains Mono', ui-monospace, monospace !important;
 }

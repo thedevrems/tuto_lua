@@ -9,7 +9,7 @@ interface Props {
 export default function TestResults({ results, runError }: Props) {
   if (runError) {
     return (
-      <div className="px-3 py-3 text-[12.5px] font-mono text-white border-l-2 border-white">
+      <div className="px-3 py-3 text-[12.5px] font-mono text-danger border-l-2 border-danger">
         ✗ Le code n'a pas pu s'exécuter — {runError}
       </div>
     )
@@ -22,12 +22,12 @@ export default function TestResults({ results, runError }: Props) {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-ink-800">
-        <span className="text-[11px] uppercase tracking-widest text-ink-400">Tests</span>
+      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200">
+        <span className="text-[11px] uppercase tracking-widest text-gray-500">Tests</span>
         <span
           className={
             'text-[11px] font-mono px-2 py-0.5 rounded border ' +
-            (allPassed ? 'border-white text-white' : 'border-ink-600 text-ink-300')
+            (allPassed ? 'border-success-border bg-success-bg text-success' : 'border-gray-300 text-gray-600')
           }
         >
           {passed}/{results.length} réussis
@@ -38,22 +38,22 @@ export default function TestResults({ results, runError }: Props) {
         {results.map((r, i) => (
           <div
             key={i}
-            className="flex items-start gap-2 px-2 py-1.5 rounded text-[12.5px] font-mono bg-ink-900/60"
+            className="flex items-start gap-2 px-2 py-1.5 rounded text-[12.5px] font-mono bg-gray-100"
           >
-            <span className={'mt-px ' + (r.passed ? 'text-white' : 'text-ink-500')}>
+            <span className={'mt-px ' + (r.passed ? 'text-success' : 'text-danger')}>
               {r.passed ? '✓' : '✗'}
             </span>
             <span className="flex-1">
-              <span className={r.passed ? 'text-ink-200' : 'text-white'}>{r.name}</span>
+              <span className={r.passed ? 'text-gray-700' : 'text-black font-medium'}>{r.name}</span>
               {!r.passed && r.message && (
-                <span className="block text-ink-400 mt-0.5">{r.message}</span>
+                <span className="block text-gray-500 mt-0.5">{r.message}</span>
               )}
             </span>
           </div>
         ))}
 
         {allPassed && (
-          <div className="px-2 py-2 mt-1 text-[12.5px] text-white">
+          <div className="px-2 py-2 mt-1 text-[12.5px] text-success font-medium">
             Tous les tests passent. Bien joué !
           </div>
         )}
