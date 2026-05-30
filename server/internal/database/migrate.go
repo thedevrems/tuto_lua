@@ -96,6 +96,36 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS tickets (
+  id           TEXT PRIMARY KEY,
+  type         TEXT NOT NULL DEFAULT 'report',
+  subject      TEXT NOT NULL,
+  category     TEXT NOT NULL DEFAULT '',
+  status       TEXT NOT NULL DEFAULT 'open',
+  details      TEXT NOT NULL DEFAULT '',
+  amount_cents INTEGER NOT NULL DEFAULT 0,
+  currency     TEXT NOT NULL DEFAULT 'eur',
+  creator_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  closed_at    TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ticket_members (
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  user_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  added_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (ticket_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS ticket_messages (
+  id         TEXT PRIMARY KEY,
+  ticket_id  TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  author_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body       TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id         TEXT PRIMARY KEY,
   user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -114,6 +144,10 @@ CREATE INDEX IF NOT EXISTS idx_progress_user     ON progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_enrollments_user  ON enrollments(user_id);
 CREATE INDEX IF NOT EXISTS idx_payments_user     ON payments(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_creator    ON tickets(creator_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_type       ON tickets(type);
+CREATE INDEX IF NOT EXISTS idx_ticket_members_user ON ticket_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_ticket_messages_ticket ON ticket_messages(ticket_id);
 `
 
 // Migrate creates every table and index if they do not already exist.

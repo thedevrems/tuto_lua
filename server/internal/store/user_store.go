@@ -42,6 +42,25 @@ func (s *Store) GetUserByUsername(username string) (models.User, error) {
 	return scanUser(s.db.QueryRow(`SELECT `+userColumns+` FROM users WHERE username = ? COLLATE NOCASE`, username))
 }
 
+// ListAdminIDs returns the ids of every administrator (to notify them).
+func (s *Store) ListAdminIDs() ([]string, error) {
+	rows, err := s.db.Query(`SELECT id FROM users WHERE role = 'admin'`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
+}
+
 // UpdatePassword replaces a user's password hash.
 func (s *Store) UpdatePassword(userID, passwordHash string) error {
 	return s.execAffecting(`UPDATE users SET password_hash = ? WHERE id = ?`, passwordHash, userID)

@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage'
 import LearnPage from './pages/LearnPage'
 import AdminPage from './pages/AdminPage'
 import ProfilePage from './pages/ProfilePage'
+import SupportPage from './pages/SupportPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 /** Top-level route table. Public marketing + auth pages, the learning IDE,
@@ -23,6 +24,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/support"
+        element={
+          <ProtectedRoute>
+            <SupportPage />
           </ProtectedRoute>
         }
       />

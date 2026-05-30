@@ -2,8 +2,9 @@ import { useState } from 'react'
 import SiteLayout from '../components/layout/SiteLayout'
 import UsersPanel from '../components/admin/UsersPanel'
 import ContentPanel from '../components/admin/ContentPanel'
+import TicketsPanel from '../components/admin/TicketsPanel'
 
-type Tab = 'users' | 'content'
+type Tab = 'users' | 'content' | 'support'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users')
@@ -21,9 +22,16 @@ export default function AdminPage() {
           <TabButton active={tab === 'content'} onClick={() => setTab('content')}>
             Cours & tests
           </TabButton>
+          <TabButton active={tab === 'support'} onClick={() => setTab('support')}>
+            Support
+          </TabButton>
         </div>
 
-        <div className="mt-8">{tab === 'users' ? <UsersPanel /> : <ContentPanel />}</div>
+        <div className="mt-8">
+          {tab === 'users' && <UsersPanel />}
+          {tab === 'content' && <ContentPanel />}
+          {tab === 'support' && <TicketsPanel />}
+        </div>
       </div>
     </SiteLayout>
   )

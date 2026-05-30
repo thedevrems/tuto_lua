@@ -88,6 +88,38 @@ export interface ApiNotification {
   createdAt: string
 }
 
+export interface ApiTicketMessage {
+  id: string
+  ticketId: string
+  authorId: string
+  authorName: string
+  body: string
+  createdAt: string
+}
+
+export interface ApiTicketMember {
+  userId: string
+  username: string
+}
+
+export interface ApiTicket {
+  id: string
+  type: 'report' | 'devis'
+  subject: string
+  category: string
+  status: string
+  details: string
+  amountCents: number
+  currency: string
+  creatorId: string
+  creatorName: string
+  createdAt: string
+  updatedAt: string
+  closedAt?: string
+  messages?: ApiTicketMessage[]
+  members?: ApiTicketMember[]
+}
+
 /** Error carrying the HTTP status so callers can branch on it. */
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -167,6 +199,15 @@ export const api = {
     markAllRead: () => request<null>('POST', '/api/notifications/read-all'),
   },
 
+  tickets: {
+    create: (subject: string, category: string, body: string) =>
+      request<ApiTicket>('POST', '/api/tickets', { subject, category, body }),
+    mine: () => request<ApiTicket[]>('GET', '/api/tickets'),
+    get: (id: string) => request<ApiTicket>('GET', `/api/tickets/${id}`),
+    postMessage: (id: string, body: string) =>
+      request<ApiTicketMessage>('POST', `/api/tickets/${id}/messages`, { body }),
+  },
+
   payments: {
     checkout: (courseId: string) =>
       request<{ url: string }>('POST', '/api/payments/checkout', { courseId }),
@@ -199,6 +240,11 @@ export const api = {
     deleteExercise: (exerciseId: string) => request<null>('DELETE', `/api/admin/exercises/${exerciseId}`),
     updateTest: (testId: string, input: NewTest) => request<null>('PUT', `/api/admin/tests/${testId}`, input),
     deleteTest: (testId: string) => request<null>('DELETE', `/api/admin/tests/${testId}`),
+
+    tickets: (type?: string) => request<ApiTicket[]>('GET', `/api/admin/tickets${type ? `?type=${type}` : ''}`),
+    closeTicket: (id: string) => request<null>('POST', `/api/admin/tickets/${id}/close`),
+    addTicketMember: (id: string, userId: string) =>
+      request<null>('POST', `/api/admin/tickets/${id}/members`, { userId }),
   },
 }
 

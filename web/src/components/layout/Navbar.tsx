@@ -43,6 +43,9 @@ export default function Navbar() {
                 </Link>
               )}
               <NotificationsBell />
+              <Link to="/support" className="btn btn-ghost btn-sm">
+                Support
+              </Link>
               <Link to="/profile" className="btn btn-ghost btn-sm">
                 Mon profil
               </Link>

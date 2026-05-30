@@ -15,11 +15,14 @@ import (
 	"github.com/thedevrems/tuto_lua/server/internal/auth"
 	"github.com/thedevrems/tuto_lua/server/internal/config"
 	"github.com/thedevrems/tuto_lua/server/internal/database"
+	"github.com/thedevrems/tuto_lua/server/internal/email"
 	"github.com/thedevrems/tuto_lua/server/internal/handlers"
+	"github.com/thedevrems/tuto_lua/server/internal/notify"
 	"github.com/thedevrems/tuto_lua/server/internal/payment"
 	"github.com/thedevrems/tuto_lua/server/internal/router"
 	"github.com/thedevrems/tuto_lua/server/internal/seed"
 	"github.com/thedevrems/tuto_lua/server/internal/store"
+	"github.com/thedevrems/tuto_lua/server/internal/ticket"
 	"github.com/thedevrems/tuto_lua/server/internal/token"
 )
 
@@ -67,6 +70,9 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 	authSvc := auth.NewService(st, tokens)
 	guard := auth.NewMiddleware(tokens, st)
 	paySvc := payment.NewService(st, cfg.StripeSecretKey, cfg.StripeWebhook, cfg.FrontendURL)
+	mailer := email.NewSMTP(cfg.SMTPHost, cfg.SMTPPort, cfg.SMTPUser, cfg.SMTPPassword, cfg.SMTPFrom)
+	notifier := notify.New(st, mailer)
+	ticketSvc := ticket.NewService(st, notifier, cfg.FrontendURL)
 	return router.New(router.Deps{
 		AllowedOrigin: cfg.AllowedOrigin,
 		Auth:          handlers.NewAuthHandler(authSvc),
@@ -77,6 +83,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 		Payments:      handlers.NewPaymentHandler(paySvc),
 		Profile:       handlers.NewProfileHandler(authSvc, st),
 		Notifications: handlers.NewNotificationHandler(st),
+		Tickets:       handlers.NewTicketHandler(ticketSvc),
 		Guard:         guard,
 	})
 }

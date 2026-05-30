@@ -22,6 +22,7 @@ type Deps struct {
 	Payments      *handlers.PaymentHandler
 	Profile       *handlers.ProfileHandler
 	Notifications *handlers.NotificationHandler
+	Tickets       *handlers.TicketHandler
 	Guard         *auth.Middleware
 }
 
@@ -38,10 +39,22 @@ func New(d Deps) http.Handler {
 		mountProgressRoutes(api, d)
 		mountProfileRoutes(api, d)
 		mountNotificationRoutes(api, d)
+		mountTicketRoutes(api, d)
 		mountAdminRoutes(api, d)
 		mountPaymentRoutes(api, d)
 	})
 	return r
+}
+
+// mountTicketRoutes exposes the user-facing report/devis conversation endpoints.
+func mountTicketRoutes(api chi.Router, d Deps) {
+	api.Route("/tickets", func(t chi.Router) {
+		t.Use(d.Guard.RequireAuth)
+		t.Get("/", d.Tickets.ListMine)
+		t.Post("/", d.Tickets.Create)
+		t.Get("/{id}", d.Tickets.Get)
+		t.Post("/{id}/messages", d.Tickets.PostMessage)
+	})
 }
 
 // mountNotificationRoutes exposes the current user's in-app notifications.
@@ -79,6 +92,9 @@ func mountAdminRoutes(api chi.Router, d Deps) {
 		a.Get("/users", d.Admin.ListUsers)
 		a.Get("/users/{userId}/progress", d.Admin.UserProgress)
 		a.Get("/users/{userId}/courses", d.Admin.UserCourses)
+		a.Get("/tickets", d.Tickets.ListAll)
+		a.Post("/tickets/{id}/close", d.Tickets.Close)
+		a.Post("/tickets/{id}/members", d.Tickets.AddMember)
 		a.Post("/enrollments", d.Admin.GrantAccess)
 		a.Get("/courses", d.Admin.ListCourses)
 		a.Post("/courses", d.Admin.CreateCourse)
