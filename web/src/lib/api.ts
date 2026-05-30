@@ -165,6 +165,17 @@ export const api = {
       request<CreatedId>('POST', `/api/admin/chapters/${chapterId}/exercises`, input),
     createTest: (exerciseId: string, input: NewTest) =>
       request<CreatedId>('POST', `/api/admin/exercises/${exerciseId}/tests`, input),
+
+    updateCourse: (courseId: string, input: NewCourse) => request<null>('PUT', `/api/admin/courses/${courseId}`, input),
+    deleteCourse: (courseId: string) => request<null>('DELETE', `/api/admin/courses/${courseId}`),
+    updateChapter: (chapterId: string, input: NewChapter) => request<null>('PUT', `/api/admin/chapters/${chapterId}`, input),
+    deleteChapter: (chapterId: string) => request<null>('DELETE', `/api/admin/chapters/${chapterId}`),
+    updateLesson: (lessonId: string, input: NewLesson) => request<null>('PUT', `/api/admin/lessons/${lessonId}`, input),
+    deleteLesson: (lessonId: string) => request<null>('DELETE', `/api/admin/lessons/${lessonId}`),
+    updateExercise: (exerciseId: string, input: NewExercise) => request<null>('PUT', `/api/admin/exercises/${exerciseId}`, input),
+    deleteExercise: (exerciseId: string) => request<null>('DELETE', `/api/admin/exercises/${exerciseId}`),
+    updateTest: (testId: string, input: NewTest) => request<null>('PUT', `/api/admin/tests/${testId}`, input),
+    deleteTest: (testId: string) => request<null>('DELETE', `/api/admin/tests/${testId}`),
   },
 }
 

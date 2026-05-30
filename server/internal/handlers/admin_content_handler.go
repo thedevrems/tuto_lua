@@ -83,3 +83,93 @@ func (h *AdminHandler) create(w http.ResponseWriter, insert func() (string, erro
 	}
 	created(w, id)
 }
+
+// mutate runs an update/delete closure and maps the outcome to a status:
+// 404 (missing), 409 (slug conflict), 500 (other) or 204 (success).
+func (h *AdminHandler) mutate(w http.ResponseWriter, op func() error) {
+	switch err := op(); {
+	case errors.Is(err, store.ErrNotFound):
+		httpx.Error(w, http.StatusNotFound, "élément introuvable")
+	case errors.Is(err, store.ErrConflict):
+		httpx.Error(w, http.StatusConflict, "ce slug de cours est déjà utilisé")
+	case err != nil:
+		httpx.Error(w, http.StatusInternalServerError, "opération impossible")
+	default:
+		httpx.JSON(w, http.StatusNoContent, nil)
+	}
+}
+
+// UpdateCourse edits an existing course.
+func (h *AdminHandler) UpdateCourse(w http.ResponseWriter, r *http.Request) {
+	var c models.Course
+	if !bind(w, r, &c) {
+		return
+	}
+	c.ID = chi.URLParam(r, "courseId")
+	h.mutate(w, func() error { return h.store.UpdateCourse(c) })
+}
+
+// DeleteCourse removes a course and all its content.
+func (h *AdminHandler) DeleteCourse(w http.ResponseWriter, r *http.Request) {
+	h.mutate(w, func() error { return h.store.DeleteCourse(chi.URLParam(r, "courseId")) })
+}
+
+// UpdateChapter edits an existing chapter.
+func (h *AdminHandler) UpdateChapter(w http.ResponseWriter, r *http.Request) {
+	var c models.Chapter
+	if !bind(w, r, &c) {
+		return
+	}
+	c.ID = chi.URLParam(r, "chapterId")
+	h.mutate(w, func() error { return h.store.UpdateChapter(c) })
+}
+
+// DeleteChapter removes a chapter and its lessons/exercises.
+func (h *AdminHandler) DeleteChapter(w http.ResponseWriter, r *http.Request) {
+	h.mutate(w, func() error { return h.store.DeleteChapter(chi.URLParam(r, "chapterId")) })
+}
+
+// UpdateLesson edits an existing lesson.
+func (h *AdminHandler) UpdateLesson(w http.ResponseWriter, r *http.Request) {
+	var l models.Lesson
+	if !bind(w, r, &l) {
+		return
+	}
+	l.ID = chi.URLParam(r, "lessonId")
+	h.mutate(w, func() error { return h.store.UpdateLesson(l) })
+}
+
+// DeleteLesson removes a lesson.
+func (h *AdminHandler) DeleteLesson(w http.ResponseWriter, r *http.Request) {
+	h.mutate(w, func() error { return h.store.DeleteLesson(chi.URLParam(r, "lessonId")) })
+}
+
+// UpdateExercise edits an existing exercise.
+func (h *AdminHandler) UpdateExercise(w http.ResponseWriter, r *http.Request) {
+	var e models.Exercise
+	if !bind(w, r, &e) {
+		return
+	}
+	e.ID = chi.URLParam(r, "exerciseId")
+	h.mutate(w, func() error { return h.store.UpdateExercise(e) })
+}
+
+// DeleteExercise removes an exercise and its tests.
+func (h *AdminHandler) DeleteExercise(w http.ResponseWriter, r *http.Request) {
+	h.mutate(w, func() error { return h.store.DeleteExercise(chi.URLParam(r, "exerciseId")) })
+}
+
+// UpdateTest edits an existing automated test.
+func (h *AdminHandler) UpdateTest(w http.ResponseWriter, r *http.Request) {
+	var t models.ExerciseTest
+	if !bind(w, r, &t) {
+		return
+	}
+	t.ID = chi.URLParam(r, "testId")
+	h.mutate(w, func() error { return h.store.UpdateTest(t) })
+}
+
+// DeleteTest removes an automated test.
+func (h *AdminHandler) DeleteTest(w http.ResponseWriter, r *http.Request) {
+	h.mutate(w, func() error { return h.store.DeleteTest(chi.URLParam(r, "testId")) })
+}

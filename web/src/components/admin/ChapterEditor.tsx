@@ -1,118 +1,168 @@
 import { useState } from 'react'
-import { api, type ApiChapter, type ApiExercise } from '../../lib/api'
+import { api, type ApiChapter, type ApiExercise, type ApiLesson, type ApiTest } from '../../lib/api'
+import { ExerciseForm, LessonForm, TestForm } from './forms'
 
-/** Authoring UI for a single chapter: its lessons, exercises and their tests. */
+const alertErr = (e: unknown) => alert(e instanceof Error ? e.message : 'Échec de l’opération')
+const confirmDelete = (label: string) => window.confirm(`Supprimer ${label} ? Cette action est irréversible.`)
+
+/** Authoring UI for a single chapter: edit/delete its lessons, exercises and tests. */
 export default function ChapterEditor({ chapter, onChange }: { chapter: ApiChapter; onChange: () => void }) {
   const lessons = chapter.lessons ?? []
   const exercises = chapter.exercises ?? []
   const nextPos = lessons.length + exercises.length
+  const [renaming, setRenaming] = useState(false)
+
+  const deleteChapter = () => {
+    if (!confirmDelete(`le chapitre « ${chapter.title} »`)) return
+    api.admin.deleteChapter(chapter.id).then(onChange).catch(alertErr)
+  }
 
   return (
     <div className="card">
-      <h4 className="font-semibold text-black">{chapter.title}</h4>
+      <div className="flex items-center justify-between gap-2">
+        <h4 className="font-semibold text-black">{chapter.title}</h4>
+        <div className="flex gap-1">
+          <button onClick={() => setRenaming((r) => !r)} className="btn btn-ghost btn-sm">Renommer</button>
+          <button onClick={deleteChapter} className="btn btn-ghost btn-sm text-danger">Supprimer</button>
+        </div>
+      </div>
+      {renaming && <RenameChapter chapter={chapter} onDone={() => { setRenaming(false); onChange() }} />}
 
-      <ul className="mt-3 space-y-1 text-sm text-gray-700">
+      <div className="mt-3 space-y-2">
         {lessons.map((l) => (
-          <li key={l.id}>📄 {l.title}</li>
+          <LessonRow key={l.id} lesson={l} onChange={onChange} />
         ))}
         {exercises.map((e) => (
           <ExerciseBlock key={e.id} ex={e} onChange={onChange} />
         ))}
-      </ul>
+      </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <AddLesson chapterId={chapter.id} position={nextPos} onDone={onChange} />
-        <AddExercise chapterId={chapter.id} position={nextPos} onDone={onChange} />
+        <LessonForm position={nextPos} onSubmit={(v) => api.admin.createLesson(chapter.id, v).then(onChange)} />
+        <ExerciseForm position={nextPos} onSubmit={(v) => api.admin.createExercise(chapter.id, v).then(onChange)} />
       </div>
     </div>
   )
 }
 
+function RenameChapter({ chapter, onDone }: { chapter: ApiChapter; onDone: () => void }) {
+  const [title, setTitle] = useState(chapter.title)
+  const [summary, setSummary] = useState(chapter.summary)
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    api.admin.updateChapter(chapter.id, { title, summary, position: chapter.position }).then(onDone).catch(alertErr)
+  }
+  return (
+    <form onSubmit={submit} className="mt-2 flex flex-wrap gap-2">
+      <input className="input !py-1.5 flex-1 text-sm" value={title} onChange={(e) => setTitle(e.target.value)} required />
+      <input className="input !py-1.5 flex-1 text-sm" placeholder="Résumé" value={summary} onChange={(e) => setSummary(e.target.value)} />
+      <button className="btn btn-secondary btn-sm">Enregistrer</button>
+    </form>
+  )
+}
+
+function LessonRow({ lesson, onChange }: { lesson: ApiLesson; onChange: () => void }) {
+  const [edit, setEdit] = useState(false)
+  const del = () => {
+    if (!confirmDelete(`la leçon « ${lesson.title} »`)) return
+    api.admin.deleteLesson(lesson.id).then(onChange).catch(alertErr)
+  }
+  if (edit) {
+    return (
+      <LessonForm
+        initial={{ title: lesson.title, content: lesson.content, position: lesson.position }}
+        position={lesson.position}
+        onSubmit={(v) => api.admin.updateLesson(lesson.id, v).then(() => { setEdit(false); onChange() })}
+        onCancel={() => setEdit(false)}
+      />
+    )
+  }
+  return (
+    <Row icon="📄" label={lesson.title} onEdit={() => setEdit(true)} onDelete={del} />
+  )
+}
+
 function ExerciseBlock({ ex, onChange }: { ex: ApiExercise; onChange: () => void }) {
   const [open, setOpen] = useState(false)
+  const [edit, setEdit] = useState(false)
+  const tests = ex.tests ?? []
+  const del = () => {
+    if (!confirmDelete(`l’exercice « ${ex.title} »`)) return
+    api.admin.deleteExercise(ex.id).then(onChange).catch(alertErr)
+  }
   return (
-    <li className="border-l-2 border-gray-200 pl-3">
-      <button onClick={() => setOpen((o) => !o)} className="text-left text-black hover:underline">
-        ✏️ {ex.title} <span className="text-xs text-gray-400">({(ex.tests ?? []).length} test(s))</span>
-      </button>
-      {open && (
+    <div className="rounded-md border border-gray-200 p-2">
+      <div className="flex items-center gap-2 text-sm">
+        <button onClick={() => setOpen((o) => !o)} className="flex-1 text-left text-black hover:underline">
+          ✏️ {ex.title} <span className="text-xs text-gray-400">({tests.length} test(s))</span>
+        </button>
+        <button onClick={() => setEdit((e) => !e)} className="text-gray-500 hover:text-black">Modifier</button>
+        <button onClick={del} className="text-gray-500 hover:text-danger">Supprimer</button>
+      </div>
+
+      {edit && (
         <div className="mt-2">
-          {(ex.tests ?? []).map((t) => (
-            <div key={t.id} className="text-xs text-gray-500">• {t.name}</div>
-          ))}
-          <AddTest exerciseId={ex.id} position={(ex.tests ?? []).length} onDone={onChange} />
+          <ExerciseForm
+            initial={{ title: ex.title, difficulty: ex.difficulty, statement: ex.statement, starter: ex.starter, solution: ex.solution ?? '', hints: ex.hints ?? [], position: ex.position }}
+            position={ex.position}
+            onSubmit={(v) => api.admin.updateExercise(ex.id, v).then(() => { setEdit(false); onChange() })}
+            onCancel={() => setEdit(false)}
+          />
         </div>
       )}
-    </li>
+
+      {open && (
+        <div className="mt-2 space-y-1 border-t border-gray-100 pt-2">
+          {tests.map((t) => (
+            <TestRow key={t.id} test={t} onChange={onChange} />
+          ))}
+          <TestForm position={tests.length} onSubmit={(v) => api.admin.createTest(ex.id, v).then(onChange)} />
+        </div>
+      )}
+    </div>
   )
 }
 
-function AddLesson({ chapterId, position, onDone }: { chapterId: string; position: number; onDone: () => void }) {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const submit = async () => {
-    await api.admin.createLesson(chapterId, { title, content, position })
-    setTitle('')
-    setContent('')
-    onDone()
+function TestRow({ test, onChange }: { test: ApiTest; onChange: () => void }) {
+  const [edit, setEdit] = useState(false)
+  const del = () => {
+    if (!confirmDelete(`le test « ${test.name} »`)) return
+    api.admin.deleteTest(test.id).then(onChange).catch(alertErr)
   }
+  if (edit) {
+    return (
+      <TestForm
+        initial={{ name: test.name, code: test.code, position: test.position }}
+        position={test.position}
+        onSubmit={(v) => api.admin.updateTest(test.id, v).then(() => { setEdit(false); onChange() })}
+        onCancel={() => setEdit(false)}
+      />
+    )
+  }
+  return <Row icon="•" label={test.name} small onEdit={() => setEdit(true)} onDelete={del} />
+}
+
+/** A read-only content row with Modifier / Supprimer actions. */
+function Row({
+  icon,
+  label,
+  small,
+  onEdit,
+  onDelete,
+}: {
+  icon: string
+  label: string
+  small?: boolean
+  onEdit: () => void
+  onDelete: () => void
+}) {
   return (
-    <form onSubmit={runner(submit)} className="space-y-2 rounded-md border border-gray-200 p-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Nouvelle leçon</div>
-      <input className="input !py-1.5 text-sm" placeholder="Titre" value={title} onChange={(e) => setTitle(e.target.value)} required />
-      <textarea className="input !py-1.5 text-sm" placeholder="Contenu (markdown)" rows={3} value={content} onChange={(e) => setContent(e.target.value)} />
-      <button className="btn btn-secondary btn-sm w-full">Ajouter la leçon</button>
-    </form>
+    <div className={'flex items-center gap-2 ' + (small ? 'text-xs' : 'text-sm')}>
+      <span className="flex-1 text-gray-700">
+        {icon} {label}
+      </span>
+      <button onClick={onEdit} className="text-gray-500 hover:text-black">Modifier</button>
+      <button onClick={onDelete} className="text-gray-500 hover:text-danger">Supprimer</button>
+    </div>
   )
-}
-
-function AddExercise({ chapterId, position, onDone }: { chapterId: string; position: number; onDone: () => void }) {
-  const [f, setF] = useState({ title: '', difficulty: 'facile', statement: '', starter: '', solution: '' })
-  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((s) => ({ ...s, [k]: e.target.value }))
-  const submit = async () => {
-    await api.admin.createExercise(chapterId, { ...f, difficulty: f.difficulty as 'facile', hints: [], position })
-    setF({ title: '', difficulty: 'facile', statement: '', starter: '', solution: '' })
-    onDone()
-  }
-  return (
-    <form onSubmit={runner(submit)} className="space-y-2 rounded-md border border-gray-200 p-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">Nouvel exercice</div>
-      <input className="input !py-1.5 text-sm" placeholder="Titre" value={f.title} onChange={set('title')} required />
-      <select className="input !py-1.5 text-sm" value={f.difficulty} onChange={set('difficulty')}>
-        <option value="facile">Facile</option>
-        <option value="moyen">Moyen</option>
-        <option value="difficile">Difficile</option>
-      </select>
-      <textarea className="input !py-1.5 text-sm" placeholder="Énoncé (markdown)" rows={2} value={f.statement} onChange={set('statement')} />
-      <textarea className="input !py-1.5 font-mono text-sm" placeholder="Code de départ" rows={2} value={f.starter} onChange={set('starter')} />
-      <textarea className="input !py-1.5 font-mono text-sm" placeholder="Solution" rows={2} value={f.solution} onChange={set('solution')} />
-      <button className="btn btn-secondary btn-sm w-full">Ajouter l'exercice</button>
-    </form>
-  )
-}
-
-function AddTest({ exerciseId, position, onDone }: { exerciseId: string; position: number; onDone: () => void }) {
-  const [name, setName] = useState('')
-  const [code, setCode] = useState('')
-  const submit = async () => {
-    await api.admin.createTest(exerciseId, { name, code, position })
-    setName('')
-    setCode('')
-    onDone()
-  }
-  return (
-    <form onSubmit={runner(submit)} className="mt-2 space-y-2 rounded-md border border-gray-200 p-2">
-      <input className="input !py-1.5 text-sm" placeholder="Nom du test" value={name} onChange={(e) => setName(e.target.value)} required />
-      <textarea className="input !py-1.5 font-mono text-sm" placeholder='Code Lua, ex: assert(...)' rows={2} value={code} onChange={(e) => setCode(e.target.value)} required />
-      <button className="btn btn-ghost btn-sm w-full">Ajouter le test</button>
-    </form>
-  )
-}
-
-// runner wraps an async submit handler with preventDefault + error alerting.
-function runner(fn: () => Promise<void>) {
-  return (e: React.FormEvent) => {
-    e.preventDefault()
-    fn().catch((err) => alert(err instanceof Error ? err.message : 'Échec de la création'))
-  }
 }

@@ -2,6 +2,62 @@ import { useEffect, useState } from 'react'
 import { api, type ApiCourse } from '../../lib/api'
 import ChapterEditor from './ChapterEditor'
 
+function CourseSettings({ course, onSaved, onDeleted }: { course: ApiCourse; onSaved: () => void; onDeleted: () => void }) {
+  const [f, setF] = useState({
+    slug: course.slug,
+    title: course.title,
+    summary: course.summary,
+    priceEuros: (course.priceCents / 100).toString(),
+    position: course.position.toString(),
+    published: course.published,
+  })
+  const set = (k: keyof typeof f, v: string | boolean) => setF((s) => ({ ...s, [k]: v }))
+
+  const save = (e: React.FormEvent) => {
+    e.preventDefault()
+    api.admin
+      .updateCourse(course.id, {
+        slug: f.slug,
+        title: f.title,
+        summary: f.summary,
+        priceCents: Math.round(parseFloat(f.priceEuros || '0') * 100),
+        currency: course.currency,
+        published: f.published,
+        position: parseInt(f.position || '0', 10),
+      })
+      .then(onSaved)
+      .catch((err) => alert(err instanceof Error ? err.message : 'Échec'))
+  }
+
+  const remove = () => {
+    if (!window.confirm(`Supprimer le cours « ${course.title} » et tout son contenu ?`)) return
+    api.admin.deleteCourse(course.id).then(onDeleted).catch((err) => alert(err instanceof Error ? err.message : 'Échec'))
+  }
+
+  return (
+    <form onSubmit={save} className="card space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-black">Paramètres du cours</h3>
+        <button type="button" onClick={remove} className="btn btn-ghost btn-sm text-danger">Supprimer le cours</button>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <input className="input" placeholder="slug" value={f.slug} onChange={(e) => set('slug', e.target.value)} required />
+        <input className="input" placeholder="Titre" value={f.title} onChange={(e) => set('title', e.target.value)} required />
+      </div>
+      <textarea className="input" placeholder="Résumé" rows={2} value={f.summary} onChange={(e) => set('summary', e.target.value)} />
+      <div className="grid gap-3 sm:grid-cols-3">
+        <input className="input" type="number" step="0.01" placeholder="Prix (€)" value={f.priceEuros} onChange={(e) => set('priceEuros', e.target.value)} />
+        <input className="input" type="number" placeholder="Position" value={f.position} onChange={(e) => set('position', e.target.value)} />
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" checked={f.published} onChange={(e) => set('published', e.target.checked)} />
+          Publié
+        </label>
+      </div>
+      <button className="btn btn-secondary">Enregistrer les modifications</button>
+    </form>
+  )
+}
+
 export default function ContentPanel() {
   const [courses, setCourses] = useState<ApiCourse[]>([])
   const [slug, setSlug] = useState('')
@@ -49,6 +105,18 @@ export default function ContentPanel() {
 
       {tree && (
         <div className="space-y-4">
+          <CourseSettings
+            course={tree}
+            onSaved={() => {
+              refreshCourses()
+              reloadTree()
+            }}
+            onDeleted={() => {
+              setSlug('')
+              setTree(null)
+              refreshCourses()
+            }}
+          />
           <AddChapter courseId={tree.id} position={(tree.chapters ?? []).length} onDone={reloadTree} />
           {(tree.chapters ?? []).map((ch) => (
             <ChapterEditor key={ch.id} chapter={ch} onChange={reloadTree} />

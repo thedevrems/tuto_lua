@@ -70,6 +70,7 @@ internal/
 | POST    | `/api/admin/chapters/{chapterId}/lessons`  | admin | Créer une leçon         |
 | POST    | `/api/admin/chapters/{chapterId}/exercises`| admin | Créer un exercice       |
 | POST    | `/api/admin/exercises/{exerciseId}/tests`  | admin | Créer un test           |
+| PUT/DELETE | `/api/admin/{courses\|chapters\|lessons\|exercises\|tests}/{id}` | admin | Modifier / supprimer (suppression en cascade) |
 | POST    | `/api/payments/checkout` | connecté | Crée une session Stripe Checkout (→ URL) |
 | POST    | `/api/payments/webhook`  | Stripe   | Webhook : débloque le cours après paiement |
 

@@ -62,7 +62,23 @@ func mountAdminRoutes(api chi.Router, d Deps) {
 		a.Post("/chapters/{chapterId}/lessons", d.Admin.CreateLesson)
 		a.Post("/chapters/{chapterId}/exercises", d.Admin.CreateExercise)
 		a.Post("/exercises/{exerciseId}/tests", d.Admin.CreateTest)
+		mountAdminContentEdits(a, d)
 	})
+}
+
+// mountAdminContentEdits adds the update (PUT) and delete (DELETE) routes for
+// every content type. Deletes cascade to children in the database.
+func mountAdminContentEdits(a chi.Router, d Deps) {
+	a.Put("/courses/{courseId}", d.Admin.UpdateCourse)
+	a.Delete("/courses/{courseId}", d.Admin.DeleteCourse)
+	a.Put("/chapters/{chapterId}", d.Admin.UpdateChapter)
+	a.Delete("/chapters/{chapterId}", d.Admin.DeleteChapter)
+	a.Put("/lessons/{lessonId}", d.Admin.UpdateLesson)
+	a.Delete("/lessons/{lessonId}", d.Admin.DeleteLesson)
+	a.Put("/exercises/{exerciseId}", d.Admin.UpdateExercise)
+	a.Delete("/exercises/{exerciseId}", d.Admin.DeleteExercise)
+	a.Put("/tests/{testId}", d.Admin.UpdateTest)
+	a.Delete("/tests/{testId}", d.Admin.DeleteTest)
 }
 
 // mountCourseRoutes exposes the public course catalogue and content tree.

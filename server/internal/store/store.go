@@ -36,3 +36,20 @@ func newID() string {
 func isUniqueViolation(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed")
 }
+
+// execAffecting runs a statement that must touch exactly one row; it returns
+// ErrNotFound when nothing matched (e.g. update/delete of a missing id).
+func (s *Store) execAffecting(query string, args ...any) error {
+	res, err := s.db.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
