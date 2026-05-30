@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
+import NotificationsBell from '../NotificationsBell'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   'text-sm font-medium transition-colors ' + (isActive ? 'text-black' : 'text-gray-600 hover:text-black')
@@ -41,6 +42,7 @@ export default function Navbar() {
                   Admin
                 </Link>
               )}
+              <NotificationsBell />
               <Link to="/profile" className="btn btn-ghost btn-sm">
                 Mon profil
               </Link>

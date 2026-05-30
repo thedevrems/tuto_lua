@@ -96,6 +96,16 @@ CREATE TABLE IF NOT EXISTS payments (
   created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS notifications (
+  id         TEXT PRIMARY KEY,
+  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title      TEXT NOT NULL,
+  body       TEXT NOT NULL DEFAULT '',
+  link       TEXT NOT NULL DEFAULT '',
+  read       INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_chapters_course   ON chapters(course_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_chapter   ON lessons(chapter_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_chapter ON exercises(chapter_id);
@@ -103,6 +113,7 @@ CREATE INDEX IF NOT EXISTS idx_tests_exercise    ON exercise_tests(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_progress_user     ON progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_enrollments_user  ON enrollments(user_id);
 CREATE INDEX IF NOT EXISTS idx_payments_user     ON payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 `
 
 // Migrate creates every table and index if they do not already exist.

@@ -21,6 +21,7 @@ type Deps struct {
 	Admin         *handlers.AdminHandler
 	Payments      *handlers.PaymentHandler
 	Profile       *handlers.ProfileHandler
+	Notifications *handlers.NotificationHandler
 	Guard         *auth.Middleware
 }
 
@@ -36,10 +37,21 @@ func New(d Deps) http.Handler {
 		mountCourseRoutes(api, d)
 		mountProgressRoutes(api, d)
 		mountProfileRoutes(api, d)
+		mountNotificationRoutes(api, d)
 		mountAdminRoutes(api, d)
 		mountPaymentRoutes(api, d)
 	})
 	return r
+}
+
+// mountNotificationRoutes exposes the current user's in-app notifications.
+func mountNotificationRoutes(api chi.Router, d Deps) {
+	api.Route("/notifications", func(n chi.Router) {
+		n.Use(d.Guard.RequireAuth)
+		n.Get("/", d.Notifications.List)
+		n.Post("/read-all", d.Notifications.MarkAllRead)
+		n.Post("/{id}/read", d.Notifications.MarkRead)
+	})
 }
 
 // mountProfileRoutes exposes the authenticated user's own account endpoints.

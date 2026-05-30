@@ -18,6 +18,11 @@ type Config struct {
 	StripeSecretKey string
 	StripeWebhook   string
 	FrontendURL     string
+	SMTPHost        string
+	SMTPPort        string
+	SMTPUser        string
+	SMTPPassword    string
+	SMTPFrom        string
 }
 
 // Load reads the environment and applies sensible development defaults.
@@ -36,6 +41,11 @@ func Load() (Config, error) {
 		StripeSecretKey: env("STRIPE_SECRET_KEY", ""),
 		StripeWebhook:   env("STRIPE_WEBHOOK_SECRET", ""),
 		FrontendURL:     env("FRONTEND_URL", "http://localhost:5173"),
+		SMTPHost:        env("SMTP_HOST", ""),
+		SMTPPort:        env("SMTP_PORT", "587"),
+		SMTPUser:        env("SMTP_USER", ""),
+		SMTPPassword:    env("SMTP_PASSWORD", ""),
+		SMTPFrom:        env("SMTP_FROM", "Lua Academy <no-reply@lua-academy.local>"),
 	}, nil
 }
 

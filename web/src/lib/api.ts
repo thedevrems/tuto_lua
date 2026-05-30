@@ -78,6 +78,16 @@ export interface ApiProgress {
   updatedAt: string
 }
 
+export interface ApiNotification {
+  id: string
+  userId: string
+  title: string
+  body: string
+  link: string
+  read: boolean
+  createdAt: string
+}
+
 /** Error carrying the HTTP status so callers can branch on it. */
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -149,6 +159,12 @@ export const api = {
     courses: () => request<ApiCourse[]>('GET', '/api/me/courses'),
     changePassword: (currentPassword: string, newPassword: string) =>
       request<null>('POST', '/api/me/password', { currentPassword, newPassword }),
+  },
+
+  notifications: {
+    list: () => request<{ notifications: ApiNotification[]; unread: number }>('GET', '/api/notifications'),
+    markRead: (id: string) => request<null>('POST', `/api/notifications/${id}/read`),
+    markAllRead: () => request<null>('POST', '/api/notifications/read-all'),
   },
 
   payments: {

@@ -76,6 +76,7 @@ func buildRouter(cfg config.Config, st *store.Store) http.Handler {
 		Admin:         handlers.NewAdminHandler(st),
 		Payments:      handlers.NewPaymentHandler(paySvc),
 		Profile:       handlers.NewProfileHandler(authSvc, st),
+		Notifications: handlers.NewNotificationHandler(st),
 		Guard:         guard,
 	})
 }
