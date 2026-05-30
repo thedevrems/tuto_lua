@@ -20,6 +20,7 @@ type Deps struct {
 	Enrollments   *handlers.EnrollmentHandler
 	Admin         *handlers.AdminHandler
 	Payments      *handlers.PaymentHandler
+	Profile       *handlers.ProfileHandler
 	Guard         *auth.Middleware
 }
 
@@ -34,10 +35,20 @@ func New(d Deps) http.Handler {
 		mountAuthRoutes(api, d)
 		mountCourseRoutes(api, d)
 		mountProgressRoutes(api, d)
+		mountProfileRoutes(api, d)
 		mountAdminRoutes(api, d)
 		mountPaymentRoutes(api, d)
 	})
 	return r
+}
+
+// mountProfileRoutes exposes the authenticated user's own account endpoints.
+func mountProfileRoutes(api chi.Router, d Deps) {
+	api.Route("/me", func(m chi.Router) {
+		m.Use(d.Guard.RequireAuth)
+		m.Get("/courses", d.Profile.MyCourses)
+		m.Post("/password", d.Profile.ChangePassword)
+	})
 }
 
 // mountPaymentRoutes exposes Stripe Checkout creation (authenticated) and the
@@ -55,6 +66,7 @@ func mountAdminRoutes(api chi.Router, d Deps) {
 		a.Use(d.Guard.RequireAdmin)
 		a.Get("/users", d.Admin.ListUsers)
 		a.Get("/users/{userId}/progress", d.Admin.UserProgress)
+		a.Get("/users/{userId}/courses", d.Admin.UserCourses)
 		a.Post("/enrollments", d.Admin.GrantAccess)
 		a.Get("/courses", d.Admin.ListCourses)
 		a.Post("/courses", d.Admin.CreateCourse)

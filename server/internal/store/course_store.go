@@ -37,6 +37,30 @@ func (s *Store) ListCourses(publishedOnly bool) ([]models.Course, error) {
 	return courses, rows.Err()
 }
 
+// ListUserCourses returns the courses a user can access: published free courses
+// plus every course they are enrolled in.
+func (s *Store) ListUserCourses(userID string) ([]models.Course, error) {
+	rows, err := s.db.Query(
+		`SELECT `+courseColumns+` FROM courses
+		 WHERE (published = 1 AND price_cents = 0)
+		    OR id IN (SELECT course_id FROM enrollments WHERE user_id = ?)
+		 ORDER BY position, created_at`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var courses []models.Course
+	for rows.Next() {
+		c, err := scanCourse(rows)
+		if err != nil {
+			return nil, err
+		}
+		courses = append(courses, c)
+	}
+	return courses, rows.Err()
+}
+
 // GetCourseBySlug loads a single course header (no nested content).
 func (s *Store) GetCourseBySlug(slug string) (models.Course, error) {
 	return scanCourse(s.db.QueryRow(`SELECT `+courseColumns+` FROM courses WHERE slug = ?`, slug))

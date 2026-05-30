@@ -33,14 +33,17 @@ export default function Navbar() {
         <div className="ml-auto flex items-center gap-3">
           {user ? (
             <>
-              <span className="hidden text-sm text-gray-600 sm:inline">
+              <Link to="/profile" className="hidden text-sm text-gray-600 hover:text-black sm:inline">
                 Bonjour, <span className="font-medium text-black">{user.username}</span>
-              </span>
+              </Link>
               {user.role === 'admin' && (
                 <Link to="/admin" className="btn btn-ghost btn-sm">
                   Admin
                 </Link>
               )}
+              <Link to="/profile" className="btn btn-ghost btn-sm">
+                Mon profil
+              </Link>
               <Link to="/learn" className="btn btn-primary btn-sm">
                 Continuer
               </Link>

@@ -47,6 +47,23 @@ func (f *fakeUserStore) GetUserByUsername(name string) (models.User, error) {
 	return models.User{}, store.ErrNotFound
 }
 
+func (f *fakeUserStore) GetUserByID(id string) (models.User, error) {
+	if u, ok := f.users[id]; ok {
+		return u, nil
+	}
+	return models.User{}, store.ErrNotFound
+}
+
+func (f *fakeUserStore) UpdatePassword(userID, hash string) error {
+	u, ok := f.users[userID]
+	if !ok {
+		return store.ErrNotFound
+	}
+	u.PasswordHash = hash
+	f.users[userID] = u
+	return nil
+}
+
 func (f *fakeUserStore) CountUsers() (int, error) { return len(f.users), nil }
 
 func newTestService() *Service {
@@ -110,6 +127,27 @@ func TestLoginSucceedsByEmailAndUsername(t *testing.T) {
 	}
 	if _, err := svc.Login("alice", "Password1"); err != nil {
 		t.Fatalf("login by username: %v", err)
+	}
+}
+
+func TestChangePassword(t *testing.T) {
+	svc := newTestService()
+	res, _ := svc.Register("alice", "alice@example.com", "Password1")
+
+	// Wrong current password is rejected.
+	if err := svc.ChangePassword(res.User.ID, "WrongOne1", "NewPass1"); !errors.Is(err, ErrInvalidCredentials) {
+		t.Fatalf("wrong current: got %v", err)
+	}
+	// Weak new password is rejected.
+	if err := svc.ChangePassword(res.User.ID, "Password1", "weak"); err == nil {
+		t.Fatal("expected validation error for weak new password")
+	}
+	// Valid change, then the new password works for login.
+	if err := svc.ChangePassword(res.User.ID, "Password1", "NewPass1"); err != nil {
+		t.Fatalf("ChangePassword: %v", err)
+	}
+	if _, err := svc.Login("alice@example.com", "NewPass1"); err != nil {
+		t.Fatalf("login with new password: %v", err)
 	}
 }
 

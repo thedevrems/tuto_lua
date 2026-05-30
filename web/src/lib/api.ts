@@ -145,6 +145,12 @@ export const api = {
     mine: () => request<string[]>('GET', '/api/enrollments'),
   },
 
+  account: {
+    courses: () => request<ApiCourse[]>('GET', '/api/me/courses'),
+    changePassword: (currentPassword: string, newPassword: string) =>
+      request<null>('POST', '/api/me/password', { currentPassword, newPassword }),
+  },
+
   payments: {
     checkout: (courseId: string) =>
       request<{ url: string }>('POST', '/api/payments/checkout', { courseId }),
@@ -154,6 +160,7 @@ export const api = {
     users: () => request<User[]>('GET', '/api/admin/users'),
     courses: () => request<ApiCourse[]>('GET', '/api/admin/courses'),
     userProgress: (userId: string) => request<ApiProgress[]>('GET', `/api/admin/users/${userId}/progress`),
+    userCourses: (userId: string) => request<ApiCourse[]>('GET', `/api/admin/users/${userId}/courses`),
     grant: (userId: string, courseId: string) =>
       request<null>('POST', '/api/admin/enrollments', { userId, courseId }),
     createCourse: (input: NewCourse) => request<CreatedId>('POST', '/api/admin/courses', input),

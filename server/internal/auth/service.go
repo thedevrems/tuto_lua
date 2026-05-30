@@ -19,6 +19,8 @@ type UserStore interface {
 	CreateUser(username, email, passwordHash string, role models.Role) (models.User, error)
 	GetUserByEmail(email string) (models.User, error)
 	GetUserByUsername(username string) (models.User, error)
+	GetUserByID(id string) (models.User, error)
+	UpdatePassword(userID, passwordHash string) error
 	CountUsers() (int, error)
 }
 
@@ -67,6 +69,25 @@ func (s *Service) Login(identifier, password string) (Result, error) {
 		return Result{}, ErrInvalidCredentials
 	}
 	return s.issue(user)
+}
+
+// ChangePassword verifies the current password then stores a new, valid one.
+func (s *Service) ChangePassword(userID, current, next string) error {
+	user, err := s.users.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+	if err := crypto.VerifyPassword(user.PasswordHash, current); err != nil {
+		return ErrInvalidCredentials
+	}
+	if err := validate.Password(next); err != nil {
+		return err
+	}
+	hash, err := crypto.HashPassword(next)
+	if err != nil {
+		return err
+	}
+	return s.users.UpdatePassword(userID, hash)
 }
 
 // lookup finds a user by email when the identifier looks like one, else by name.

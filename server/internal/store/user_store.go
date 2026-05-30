@@ -42,6 +42,11 @@ func (s *Store) GetUserByUsername(username string) (models.User, error) {
 	return scanUser(s.db.QueryRow(`SELECT `+userColumns+` FROM users WHERE username = ? COLLATE NOCASE`, username))
 }
 
+// UpdatePassword replaces a user's password hash.
+func (s *Store) UpdatePassword(userID, passwordHash string) error {
+	return s.execAffecting(`UPDATE users SET password_hash = ? WHERE id = ?`, passwordHash, userID)
+}
+
 // CountUsers returns the total number of accounts (used to bootstrap admin).
 func (s *Store) CountUsers() (int, error) {
 	var n int

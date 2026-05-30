@@ -4,18 +4,31 @@ import { api, type ApiCourse, type ApiProgress, type User } from '../../lib/api'
 export default function UsersPanel() {
   const [users, setUsers] = useState<User[]>([])
   const [courses, setCourses] = useState<ApiCourse[]>([])
+  const [modules, setModules] = useState<Record<string, ApiCourse[]>>({})
   const [grantSel, setGrantSel] = useState<Record<string, string>>({})
   const [notice, setNotice] = useState<string | null>(null)
   const [viewing, setViewing] = useState<{ user: User; rows: ApiProgress[] } | null>(null)
 
   useEffect(() => {
     Promise.all([api.admin.users(), api.courses.list()])
-      .then(([u, c]) => {
+      .then(async ([u, c]) => {
         setUsers(u)
         setCourses(c)
+        const entries = await Promise.all(
+          u.map((usr) =>
+            api.admin
+              .userCourses(usr.id)
+              .then((cs) => [usr.id, cs] as const)
+              .catch(() => [usr.id, [] as ApiCourse[]] as const),
+          ),
+        )
+        setModules(Object.fromEntries(entries))
       })
       .catch((e) => setNotice(e.message))
   }, [])
+
+  const refreshModules = (userId: string) =>
+    api.admin.userCourses(userId).then((cs) => setModules((m) => ({ ...m, [userId]: cs }))).catch(() => {})
 
   const grant = async (userId: string) => {
     const courseId = grantSel[userId] || courses[0]?.id
@@ -23,6 +36,7 @@ export default function UsersPanel() {
     try {
       await api.admin.grant(userId, courseId)
       setNotice('Accès accordé.')
+      refreshModules(userId)
     } catch (e) {
       setNotice(e instanceof Error ? e.message : 'Échec')
     }
@@ -48,6 +62,7 @@ export default function UsersPanel() {
               <th className="py-2 pr-4 font-medium">Utilisateur</th>
               <th className="py-2 pr-4 font-medium">E-mail</th>
               <th className="py-2 pr-4 font-medium">Rôle</th>
+              <th className="py-2 pr-4 font-medium">Modules</th>
               <th className="py-2 pr-4 font-medium">Donner l'accès à un cours</th>
               <th className="py-2 font-medium">Code</th>
             </tr>
@@ -59,6 +74,19 @@ export default function UsersPanel() {
                 <td className="py-2 pr-4 text-gray-600">{u.email}</td>
                 <td className="py-2 pr-4">
                   <span className={'badge ' + (u.role === 'admin' ? 'badge-warning' : '')}>{u.role}</span>
+                </td>
+                <td className="py-2 pr-4">
+                  <div className="flex max-w-[260px] flex-wrap gap-1">
+                    {(modules[u.id] ?? []).length === 0 ? (
+                      <span className="text-xs text-gray-400">—</span>
+                    ) : (
+                      (modules[u.id] ?? []).map((c) => (
+                        <span key={c.id} className="badge" title={c.title}>
+                          {c.title.replace(/^Module \d+ — /, '')}
+                        </span>
+                      ))
+                    )}
+                  </div>
                 </td>
                 <td className="py-2 pr-4">
                   <div className="flex items-center gap-2">

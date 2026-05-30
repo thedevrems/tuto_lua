@@ -85,3 +85,16 @@ func (h *AdminHandler) UserProgress(w http.ResponseWriter, r *http.Request) {
 	}
 	httpx.JSON(w, http.StatusOK, items)
 }
+
+// UserCourses returns the courses a given user can access (free + unlocked).
+func (h *AdminHandler) UserCourses(w http.ResponseWriter, r *http.Request) {
+	courses, err := h.store.ListUserCourses(chi.URLParam(r, "userId"))
+	if err != nil {
+		httpx.Error(w, http.StatusInternalServerError, "impossible de charger les cours")
+		return
+	}
+	if courses == nil {
+		courses = []models.Course{}
+	}
+	httpx.JSON(w, http.StatusOK, courses)
+}
